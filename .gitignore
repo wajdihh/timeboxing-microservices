@@ -1,0 +1,17 @@
+# Node modules (applies to all services)
+node_modules/
+
+# Build artifacts
+dist/
+
+# Environment files (avoid leaking secrets)
+.env
+*.env
+
+# Logs
+logs/
+*.log
+
+# Dependency lockfiles (optional for consistency)
+package-lock.json
+yarn.lock
