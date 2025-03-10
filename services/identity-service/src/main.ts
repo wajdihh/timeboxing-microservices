@@ -11,16 +11,15 @@ async function bootstrap() {
   // Set API prefix (optional)
   app.setGlobalPrefix('api');
 
-  // Configure Swagger
+  // Swagger API documentation
   const config = new DocumentBuilder()
-    .setTitle('Identity Service API') // Change per service
+    .setTitle('Identity Service API')
     .setDescription('API documentation for the Identity Service')
     .setVersion('1.0')
     .addTag('Identity')
     .build();
-
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/', app, document);
+  const documentFactory = () => SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, documentFactory);
 
   await app.listen(process.env.PORT ?? 3000);
 }
