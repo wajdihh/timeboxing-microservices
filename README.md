@@ -15,22 +15,28 @@ brew install just
 lsof -i :3000
 kill -9 PID
 ```
-
-
-## Structure 
+# Structure
 hexagonal-nest/
 ├── src/
-│   ├── core/                 # 💡 Pure business logic (independent of NestJS)
-│   │   ├── domain/           # Entities, Value Objects, Aggregates
-│   │   ├── ports/            # Interfaces (Repository, Service, etc.)
-│   │   ├── usecases/         # Application logic (Use Cases)
-│   ├── infrastructure/       # 💡 Implements the core's required dependencies
-│   │   ├── repository/       # Database repository implementations
-│   │   ├── services/         # External APIs, Cache, Messaging
-│   ├── api/                  # 💡 NestJS-Specific (Controllers, DTOs)
-│   ├── config/               # Configuration files (env, DB, Redis, etc.)
-│   ├── main.ts               # NestJS entry point
-│   ├── app.module.ts         # Root module
-├── test/                     # Unit and integration tests
+│   ├── core/                 
+│   │   ├── domain/           
+│   │   ├── ports/            
+│   │   ├── usecases/         
+│   ├── infrastructure/       
+│   │   ├── repository/       
+│   │   ├── dto/              
+│   ├── api/                  
+│   │   ├── hello.controller.ts  
+│   │   ├── dto/              
+│   ├── modules/              
+│   │   ├── hello.module.ts   
+│   ├── config/               
+│   ├── main.ts               
+│   ├── app.module.ts         
+├── test/                     
 │   ├── unit/
 │   ├── integration/
+├── requests/                 # ✅ Store .http files here
+│   ├── hello.http            # .http file for testing Hello API
+│   ├── auth.http             # .http file for authentication API
+│   ├── user.http             # .http file for user-related APIs

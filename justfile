@@ -26,6 +26,6 @@ restart service:
 clean:
   docker-compose -f infra/docker/docker-compose.yml down -v --remove-orphans && docker system prune -f
 
-# Start a specific service in DEV (e.g., "just dev identity-servicee")
+# Start a specific service in DEV (e.g., "just dev identity-service")
 dev service:
   docker-compose -f infra/docker/docker-compose.yml up -d {{service}}
