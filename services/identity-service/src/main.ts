@@ -16,7 +16,7 @@ async function bootstrap() {
     .setTitle('Identity Service API') // Change per service
     .setDescription('API documentation for the Identity Service')
     .setVersion('1.0')
-    .addTag('identity')
+    .addTag('Identity')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

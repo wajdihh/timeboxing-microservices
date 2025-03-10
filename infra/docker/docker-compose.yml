@@ -26,6 +26,7 @@ services:
       - "3000:3000"
     volumes:
       - ../../services/identity-service:/app
+      - /app/node_modules
     command: ["npm", "run", "start:dev"] 
 
 volumes:
