@@ -1,5 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
-import { HelloUseCase } from '../domain/hello.usecase';
+import { HelloUseCase } from 'src/core/usecases/hello.usecase';
 
 @Controller('hello')
 export class HelloController {

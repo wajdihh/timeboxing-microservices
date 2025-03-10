@@ -13,7 +13,9 @@ services:
       - pgdata:/var/lib/postgresql/data
 
   identity-service:
-    build: .
+    build:
+      context: ../../services/identity-service  # Point to the correct service directory
+      dockerfile: Dockerfile  # Ensure it's picking the correct Dockerfile
     container_name: identity-service
     restart: always
     depends_on:
@@ -23,8 +25,8 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - .:/app
-    command: ["npm", "run", "start"]
+      - ../../services/identity-service:/app
+    command: ["npm", "run", "start:dev"] 
 
 volumes:
   pgdata:

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { HelloRepository } from './hello.repository';
-import { HelloMessage } from './hello-message.entity';
+import { HelloMessage } from '../domain/hello-message.entity';
+import { HelloRepository } from '../ports/hello.repository';
 
 @Injectable()
 export class HelloUseCase {
