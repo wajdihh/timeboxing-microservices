@@ -1,0 +1,8 @@
+services:
+  identity-service:
+    command: ["npm", "run", "start:debug"]
+    environment:
+      NODE_ENV: development
+      NODE_OPTIONS: "--inspect=0.0.0.0:9229"
+    ports:
+      - "9229:9229"  # Expose the debug port

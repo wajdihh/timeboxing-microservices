@@ -4,22 +4,16 @@ all released microservices to time boxing
 ## Install project
 
 Firstly, install docker, docker compose, make and your favorite IDE, then
-clone the project and install the following libs.
+clone the project.
 
 ```
-> git clone https://github.com/wajdihh/timeboxing-microservices.git
-
-> cd timeboxing-microservices
-
-> brew install just
-
-> brew install node
+todo
 ```
 
 You can watch the logs with :
 
 ```
-just logs
+make logs
 ```
 
 You have to call `just down` and `make up` when changing docker configuration.
