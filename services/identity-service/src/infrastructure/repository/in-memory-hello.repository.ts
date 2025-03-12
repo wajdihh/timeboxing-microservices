@@ -6,6 +6,7 @@ import { HelloDTO } from '../dto/hello-dto';
 @Injectable()
 export class InMemoryHelloRepository implements HelloRepository {
   getMessage(): Promise<HelloMessage> {
+    console.log('test InMemoryHelloRepository');
     return Promise.resolve(new HelloDTO('Hello, World!').toDomain());
   }
 }

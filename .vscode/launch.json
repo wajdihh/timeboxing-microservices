@@ -1,0 +1,15 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Attach to Docker",
+        "type": "node",
+        "request": "attach",
+        "port": 9230,
+        "restart": true,
+        "timeout": 10000,
+        "address": "localhost"
+      }
+    ]
+  }
+  

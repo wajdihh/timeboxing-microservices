@@ -8,9 +8,12 @@ default:
 build:
   docker-compose -f infra/docker/docker-compose.yml build
 
-# Start services in a selected environment
+# Start services in a selected environment (e.g., "just up watch / debug")
 up env:
+  @echo "Checking if Docker is running..."
+  @docker info > /dev/null 2>&1 || { echo "Docker is not running. Please start Docker and try again."; exit 1; }
   docker-compose -f infra/docker/docker-compose.yml -f infra/docker/docker-compose.{{env}}.yml up -d
+
 
 # Stop all services
 down:
@@ -35,3 +38,7 @@ logs service:
 # View logs for all services
 logs-all:
   docker-compose -f infra/docker/docker-compose.yml logs -f
+
+# Enter in Exec cmd inside the container (e.g., "just exec identity-service")
+exec service:
+  docker exec -it {{service}} sh

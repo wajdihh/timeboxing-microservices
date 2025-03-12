@@ -3,6 +3,7 @@ services:
     command: ["npm", "run", "start:debug"]
     environment:
       NODE_ENV: development
-      NODE_OPTIONS: "--inspect=0.0.0.0:9229"
+      NODE_OPTIONS: "--inspect=0.0.0.0:9230"
     ports:
-      - "9229:9229"  # Expose the debug port
+      - "3000:3000"  # Keep this so the API is accessible
+      - "9230:9230"  # Expose the debug port
