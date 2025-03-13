@@ -1,29 +1,37 @@
 services:
+# ✅ Shared Services
   postgres:
     image: postgres:latest
     container_name: identity-db
     restart: always
+    env_file:
+      - .env.${NODE_ENV}
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: identity
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      retries: 5
 
+# ✅ Microservices (Each One Only Uses Its Needed Dependencies)
   identity-service:
     build:
-      context: ../../services/identity-service  # Point to the correct service directory
-      dockerfile: Dockerfile  # Ensure it's picking the correct Dockerfile
+      context: ../../services/identity-service
+      dockerfile: Dockerfile
     container_name: identity-service
-    restart: always
-    depends_on:
-      - postgres
-    environment:
-      DATABASE_URL: "postgresql://admin:admin@postgres:5432/identity?schema=public"
+    image: myapp/identity-service:latest
     ports:
-      - "3000:3000"
+      - "${PORT}:${PORT}" 
+    env_file:
+      - .env.${NODE_ENV}
+    environment:
+      NODE_ENV: ${NODE_ENV}
     volumes:
       - ../../services/identity-service:/app
       - /app/node_modules
@@ -31,4 +39,3 @@ services:
 
 volumes:
   pgdata:
-

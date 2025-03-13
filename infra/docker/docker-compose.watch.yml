@@ -1,5 +1,0 @@
-services:
-  identity-service:
-    command: ["npm", "run", "start:dev"]
-    environment:
-      NODE_ENV: development

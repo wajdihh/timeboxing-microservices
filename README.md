@@ -14,12 +14,20 @@ clone the project and install the following libs.
 > brew install just
 
 > brew install node
+
+> cp infra/docker/.env.sample  infra/docker/.env.dev
+> cp infra/docker/.env.sample  infra/docker/.env.prod
+> cp infra/docker/.env.sample  infra/docker/.env.staging
+
+> just build 
+
 ```
 
 You can watch the logs with :
 
 ```
-just logs
+just logs-all 
+just logs {{service name}} (e.g., "just logs identity-service")
 ```
 
 You have to call `just down` and `make up` when changing docker configuration.
@@ -29,7 +37,7 @@ You have to call `just down` and `make up` when changing docker configuration.
 You can either debug with a remote :
 
 ```
-todo : make debug
+just up debug
 ```
 
 And attach any process remote debugger with port todo and host localhost.
@@ -40,16 +48,20 @@ And attach any process remote debugger with port todo and host localhost.
 #### <a name="commit-header"></a>Commit Message Header
 
 ```
-<type>(<HD-XXXX>): <short summary>
-  │       │             │
-  │       │             └─⫸ Summary in present tense. Not capitalized. No period at the end.
-  │       │
-  │       └─⫸ Commit Jira ticket ID 
+<type>(scope)(Sys Ref): <short summary>
+  │      │        │             │
+  │      │        │             └─⫸ Summary in present tense. Not capitalized.
+  │      │        │
+  │      │        └─⫸ Commit System ticket ID (aka Jira)  (optional)
+  │      │
+  │      └─⫸ microservice name
   │
   └─⫸ Commit Type: build|chore|docs|feat|fix|perf|refactor|test
 ```
 
-The `<type>` and `<summary>` fields are mandatory, the `(<scope>)` field is optional.
+Exp:  
+* **feat(auth)(JIRA-342): add JWT refresh token support**
+* **fix(task-service): resolve issue with task deletion**
 
 ##### Type
 
@@ -64,111 +76,27 @@ Must be one of the following:
 * **refactor**: A code change that neither fixes a bug nor adds a feature
 * **test**: Adding missing tests or correcting existing tests
 
-##### Summary
-
-Use the summary field to provide a succinct description of the change:
-
-* use the imperative, present tense: "change" not "changed" nor "changes"
-* don't capitalize the first letter
-* no dot (.) at the end
 
 
 # NOTES
 
 ### start the project
 ```
-npm run start:dev
+npm run start:dev # in console
+just up {{env}} # inside container (e.g., "just up watch / debug")
 
 npm run start
 ```
 
-### open this url
+### open this url to consult docs (SWAGGER)
 http://localhost:3000/api
 
-
-# Notes:
-
-### install swagger
-npm install --save @nestjs/swagger
-
-### change main code as explained here
-https://docs.nestjs.com/openapi/introduction
-
-### the open api json schema is exposed here
-http://localhost:3000/open-api-json
-
-### the open api UI is exposed here
-http://localhost:3000/open-api
-
-
-## validation was added using these instructions:
-npm i --save class-validator class-transformer
-(see doc: https://docs.nestjs.com/techniques/validation)
-
-
-## End-to-end cucumber tests
-add cucumber.yaml file:
-```
-let common = [
-  "test/acceptance/features/**/*.feature", // Specify our feature files"--require-module ts-node/register", // Load TypeScript module
-  "--require-module ts-node/register",
-  "--require test/acceptance/step-definitions/**/*.ts", // Load step definitions
-  "--format progress-bar", // Load custom formatter
-  "--format @cucumber/pretty-formatter", // Load custom formatter
-].join(" ");
-
-module.exports = {
-  default: common,
-};
-
-```
-
-
-npm i -D @types/cucumber cucumber @cucumber/pretty-formatter cucumber-tsflow chai @types/chai
-
-in package.json, add script:
-```
-"test:bdd": "cucumber-js -p default"
-```
-
-
-Launch gherkin tests with this command:
-
-```
-npm run test:bdd
-```
-
-# e2e tests
-
-Launch e2e tests with this command:
-
-```
-npm run test:e2e
-```
-
-# Unit tests
-
-Launch unit tests with this command:
-
-```
-npm run test
-```
-
-
-## Step to not forget 
-# timeboxing-microservices
-all released microservices to time boxing 
-
-## Step to not forget 
-install justfile 
-```sh
-brew install just
-```
 ## How to kill running process 
 ```sh
 lsof -i :3000
 kill -9 PID
 ```
+
 # Structure
 hexagonal-nest/
 ├── src/
