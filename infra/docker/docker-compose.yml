@@ -22,7 +22,7 @@ services:
 # ✅ Microservices (Each One Only Uses Its Needed Dependencies)
   identity-service:
     build:
-      context: ../../services/identity-service
+      context: ../../microservices/identity-service
       dockerfile: Dockerfile
     container_name: identity-service
     image: myapp/identity-service:latest
@@ -33,7 +33,7 @@ services:
     environment:
       NODE_ENV: ${NODE_ENV}
     volumes:
-      - ../../services/identity-service:/app
+      - ../../microservices/identity-service:/app
       - /app/node_modules
     command: ["npm", "run", "start"] 
 
