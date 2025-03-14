@@ -1,4 +1,5 @@
 services:
+  
 # ✅ Shared Services
   postgres:
     image: postgres:latest
@@ -18,6 +19,46 @@ services:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
       interval: 5s
       retries: 5
+      
+# Monitoring
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    depends_on:
+      - cadvisor
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://identity-service:${METRICS_PORT}/metrics"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "${GRAFANA_PORT}:3000"
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    ports:
+      - "8080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    restart: unless-stopped
 
 # ✅ Microservices (Each One Only Uses Its Needed Dependencies)
   identity-service:
@@ -27,15 +68,19 @@ services:
     container_name: identity-service
     image: myapp/identity-service:latest
     ports:
-      - "${PORT}:${PORT}" 
+      - "${PORT}:3000" 
     env_file:
       - .env.${NODE_ENV}
     environment:
       NODE_ENV: ${NODE_ENV}
+      METRICS_PORT: ${METRICS_PORT}
     volumes:
       - ../../microservices/identity-service:/app
       - /app/node_modules
-    command: ["npm", "run", "start"] 
+    command: ["npm", "run", "start"]
+    depends_on:
+      - prometheus
 
 volumes:
   pgdata:
+  grafana-storage:
