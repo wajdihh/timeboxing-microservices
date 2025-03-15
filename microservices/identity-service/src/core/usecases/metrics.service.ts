@@ -13,4 +13,5 @@ export class MetricsService {
   getMetrics(): Promise<string> {
     return this.register.metrics();
   }
+  //TODO: Adapt it to hexagonal architecture
 }

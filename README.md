@@ -15,6 +15,7 @@ clone the project and install the following libs.
 
 > brew install node
 
+> cp infra/docker/.env.sample  infra/docker/.env.local (Mandatory)
 > cp infra/docker/.env.sample  infra/docker/.env.dev
 > cp infra/docker/.env.sample  infra/docker/.env.prod
 > cp infra/docker/.env.sample  infra/docker/.env.staging

@@ -5,8 +5,9 @@ node_modules/
 dist/
 
 # Environment files (avoid leaking secrets)
-.env
-*.env
+.env.dev
+.env.staging
+.env.prod
 
 # Logs
 logs/

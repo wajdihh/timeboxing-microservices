@@ -1,4 +1,4 @@
-import { HelloMessage } from 'src/core/domain/hello-message.entity';
+import { HelloMessage } from '../../core/domain/hello-message.entity';
 
 export class HelloDTO {
   constructor(public readonly message: string) {}

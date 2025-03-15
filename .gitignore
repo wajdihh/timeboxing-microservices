@@ -5,8 +5,10 @@ node_modules/
 dist/
 
 # Environment files (avoid leaking secrets)
-.env
-*.env
+infra/docker/.env.dev
+infra/docker/.env.staging
+infra/docker/.env.prod
+
 
 # Logs
 logs/
