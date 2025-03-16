@@ -33,7 +33,7 @@ services:
     depends_on:
       - cadvisor
     healthcheck:
-      test: ["CMD", "wget", "-q", "-O", "-", "http://identity-service:${METRICS_PORT}/metrics"]
+      test: ["CMD", "wget", "-q", "-O", "-", "http://identity-service:${PORT}/metrics"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -73,11 +73,9 @@ services:
       - .env.${NODE_ENV}
     environment:
       NODE_ENV: ${NODE_ENV}
-      METRICS_PORT: ${METRICS_PORT}
     volumes:
       - ../../microservices/identity-service:/app
       - /app/node_modules
-    command: ["npm", "run", "start"]
     depends_on:
       - prometheus
 

@@ -1,0 +1,3 @@
+### Test Promethuse metrics Endpoint
+GET http://localhost:3000/api/metrics
+Accept: application/json

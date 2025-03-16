@@ -98,28 +98,15 @@ lsof -i :3000
 kill -9 PID
 ```
 
-# Structure
-hexagonal-nest/
-├── src/
-│   ├── core/                 
-│   │   ├── domain/           
-│   │   ├── ports/            
-│   │   ├── usecases/         
-│   ├── infrastructure/       
-│   │   ├── repository/       
-│   │   ├── dto/              
-│   ├── api/                  
-│   │   ├── hello.controller.ts  
-│   │   ├── dto/              
-│   ├── modules/              
-│   │   ├── hello.module.ts   
-│   ├── config/               
-│   ├── main.ts               
-│   ├── app.module.ts         
-├── test/                     
-│   ├── unit/
-│   ├── integration/
-├── requests/                 # ✅ Store .http files here
-│   ├── hello.http            # .http file for testing Hello API
-│   ├── auth.http             # .http file for authentication API
-│   ├── user.http             # .http file for user-related APIs
+# URL
+
+### Identity Service API:
+* Base URL: http://localhost:3000/api
+* Metrics endpoint: http://localhost:3000/api/metrics
+* Swagger docs: http://localhost:3000/api
+
+### Monitoring Tools:
+* Prometheus: http://localhost:9090
+* Grafana: http://localhost:3001
+* cAdvisor: http://localhost:8080
+
