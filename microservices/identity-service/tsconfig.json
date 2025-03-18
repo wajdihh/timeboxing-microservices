@@ -23,6 +23,7 @@
       "./types"
     ],
     "paths": {
+      "@timeboxing/shared": ["../packages/shared"],
       "*": [
         "node_modules/*",
         "src/types/*"

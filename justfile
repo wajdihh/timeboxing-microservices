@@ -6,13 +6,26 @@ default:
 
 # Build all services
 build:
+  # Install shared package dependencies
+  cd packages/shared && npm install && cd ../..
+  
+  # Build Docker containers
   docker-compose -f infra/docker/docker-compose.yml --env-file infra/docker/.env.sample build
+
+# Build a specific service
+build_ service:
+  docker-compose -f infra/docker/docker-compose.yml --env-file infra/docker/.env.sample build {{service}}
+
+# Clean a specific service (remove containers and images)
+clean_ service:
+  docker-compose -f infra/docker/docker-compose.yml --env-file infra/docker/.env.sample rm -f -v {{service}}
+  #docker rmi -f $(docker images -q -f "reference={{service}}")
 
 # Start services in a selected environment (e.g., "local by default or add arg like dev, staging, prod")
 up env='local':
   @echo "Checking if Docker is running..."
   @docker info > /dev/null 2>&1 || { echo "Docker is not running. Please start Docker and try again."; exit 1; }
-  NODE_ENV={{env}} docker-compose -f infra/docker/docker-compose.yml --env-file infra/docker/.env.{{env}} up -d
+  NODE_ENV={{env}} docker-compose -f infra/docker/docker-compose.yml --env-file infra/docker/.env.{{env}} up --build -d
 
 # Stop all services
 down:
@@ -49,6 +62,13 @@ exec service:
 # git push -f origin main
 push force:
   git push -f origin main
+
+# reset local env by deleting node_modules + docker images + clean")
+reset:
+  rm -rf node_modules packages/shared/node_modules
+  just clean
+  docker rmi -f $(docker images -q)
+  
 
 # Security scanning
 scan:
