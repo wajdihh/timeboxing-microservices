@@ -110,3 +110,10 @@ kill -9 PID
 * Grafana: http://localhost:3001
 * cAdvisor: http://localhost:8080
 
+### To remimber 
+#### Debug docker 
+inside the root folder run 
+> docker build --target builder -t debug-builder -f microservices/identity-service/Dockerfile .
+
+> docker run --rm -it debug-builder sh (enter in SH mode in # Build stage )
+

@@ -1,23 +1,49 @@
 # Build stage
 FROM node:18-alpine AS builder
+
 WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-COPY . .
-RUN npm run build
+
+# Copy root and workspace package files
+COPY package.json ./
+COPY packages/shared/package.json ./packages/shared/package.json
+COPY microservices/identity-service/package.json ./microservices/identity-service/package.json
+
+# Install dependencies for all workspaces
+RUN npm install --workspaces
+
+# Copy source code and config files
+COPY packages/shared ./packages/shared
+COPY microservices/identity-service ./microservices/identity-service
+COPY microservices/identity-service/tsconfig*.json ./
+
+# Build shared package first
+RUN npm run build --workspace=@timeboxing/shared
+
+# Build identity-service
+RUN npm run build --workspace=identity-service
 
 # Runtime stage
 FROM node:18-alpine
 WORKDIR /app
 
+
 # Create non-root user
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
+# Create logs directory and set permissions (Winston logs as non-root user)
+RUN mkdir -p /app/logs && chown -R appuser:appgroup /app/logs
+
 USER appuser
 
-# Copy built files from builder
+# Copy built artifacts and package files
 COPY --from=builder --chown=appuser:appgroup /app/package*.json ./
 COPY --from=builder --chown=appuser:appgroup /app/node_modules ./node_modules
-COPY --from=builder --chown=appuser:appgroup /app/dist ./dist
+COPY --from=builder --chown=appuser:appgroup /app/packages/shared/package.json ./packages/shared/package.json
+COPY --from=builder --chown=appuser:appgroup /app/packages/shared/dist ./packages/shared/dist
+COPY --from=builder --chown=appuser:appgroup /app/microservices/identity-service/package.json ./package.json
+COPY --from=builder --chown=appuser:appgroup /app/microservices/identity-service/dist ./dist
+COPY --from=builder --chown=appuser:appgroup /app/tsconfig*.json ./
+
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \

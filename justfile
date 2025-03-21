@@ -31,6 +31,14 @@ restart-service service env='local':
 clean:
   docker-compose -f infra/docker/docker-compose.yml --env-file infra/docker/.env.sample down -v --remove-orphans && docker system prune -f && docker image prune -f
 
+# Clean up NPM
+clean-npm:
+  rm -rf node_modules package-lock.json
+  rm -rf packages/shared/node_modules
+  rm -rf microservices/identity-service/node_modules
+  npm cache clean --force
+
+
 # Clean a specific service (remove containers and images)
 clean-service service:
   docker-compose -f infra/docker/docker-compose.yml --env-file infra/docker/.env.sample down -v --remove-orphans {{service}} && docker system prune -f && docker image prune -f

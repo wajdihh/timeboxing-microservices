@@ -63,8 +63,8 @@ services:
 # ✅ Microservices (Each One Only Uses Its Needed Dependencies)
   identity-service:
     build:
-      context: ../../microservices/identity-service
-      dockerfile: Dockerfile
+      context: ../..
+      dockerfile: microservices/identity-service/Dockerfile
     container_name: identity-service
     image: identity-service:latest
     ports:
@@ -74,8 +74,8 @@ services:
     environment:
       NODE_ENV: ${NODE_ENV}
     volumes:
-      - ../../microservices/identity-service:/app
-      - /app/node_modules
+      - ../../microservices/identity-service/src:/app/src #/src to avoid to enrase all /app folder , and src is used in hot reload watch mode
+      - ../../microservices/identity-service/logs:/app/logs # Mount logs directory for persistence
     depends_on:
       - prometheus
 
