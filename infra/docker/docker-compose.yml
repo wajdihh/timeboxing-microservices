@@ -63,8 +63,8 @@ services:
 # ✅ Microservices (Each One Only Uses Its Needed Dependencies)
   identity-service:
     build:
-      context: ../../microservices/identity-service
-      dockerfile: Dockerfile
+      context: ../..
+      dockerfile: microservices/identity-service/Dockerfile
     container_name: identity-service
     image: identity-service:latest
     ports:

@@ -1,10 +1,25 @@
 # Build stage
 FROM node:18-alpine AS builder
+
 WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-COPY . .
-RUN npm run build
+
+# Copy root and workspace package files
+COPY package.json package-lock.json ./
+COPY packages/shared/package.json ./packages/shared/package.json
+COPY microservices/identity-service/package.json ./microservices/identity-service/package.json
+
+# Install dependencies for all workspaces
+RUN npm install --workspaces
+
+# Copy source code
+COPY packages/shared ./packages/shared
+COPY microservices/identity-service ./microservices/identity-service
+
+# Build shared package first
+RUN npm run build --workspace=@timeboxing/shared
+
+# Build identity-service
+RUN npm run build --workspace=identity-service
 
 # Runtime stage
 FROM node:18-alpine
@@ -14,10 +29,11 @@ WORKDIR /app
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 USER appuser
 
-# Copy built files from builder
+# Copy built artifacts
 COPY --from=builder --chown=appuser:appgroup /app/package*.json ./
 COPY --from=builder --chown=appuser:appgroup /app/node_modules ./node_modules
-COPY --from=builder --chown=appuser:appgroup /app/dist ./dist
+COPY --from=builder --chown=appuser:appgroup /app/packages/shared/dist ./packages/shared/dist
+COPY --from=builder --chown=appuser:appgroup /app/microservices/identity-service/dist ./dist
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
