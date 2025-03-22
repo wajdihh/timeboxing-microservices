@@ -24,7 +24,7 @@
     "@nestjs/core": "^11.0.1",
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/swagger": "^11.0.6",
-    "@timeboxing/shared": "file:../../packages/shared/dist",
+    "@timeboxing/libs": "file:../../libs/dist",
     "prom-client": "^15.1.3",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",

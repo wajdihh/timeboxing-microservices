@@ -34,7 +34,7 @@ clean:
 # Clean up NPM
 clean-npm:
   rm -rf node_modules package-lock.json
-  rm -rf packages/shared/node_modules
+  rm -rf libs/node_modules
   rm -rf microservices/identity-service/node_modules
   npm cache clean --force
 
@@ -69,7 +69,7 @@ push force:
 
 # reset local env by deleting node_modules + docker images + clean")
 reset:
-  rm -rf node_modules packages/shared/node_modules
+  rm -rf node_modules libs/node_modules
   just clean
   docker rmi -f $(docker images -q)
   
