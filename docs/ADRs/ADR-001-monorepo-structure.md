@@ -5,10 +5,10 @@ We opted for a monorepo to streamline sharing common packages, reduce duplicatio
 
 ## Decision
 Use **Nx** or **TurboRepo** for monorepo management.
-Organize shared libraries under `/libs` and microservices under `/microservices`.
+Organize shared libraries under `/shared` and microservices under `/microservices`.
 
 ## Structure Example:
-- /libs
+- /shared
   - /loging
   - /core
   - /auth

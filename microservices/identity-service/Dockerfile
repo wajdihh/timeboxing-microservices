@@ -5,19 +5,19 @@ WORKDIR /app
 
 # Copy root and workspace package files
 COPY package.json ./
-COPY libs/package.json ./libs/package.json
+COPY shared/package.json ./shared/package.json
 COPY microservices/identity-service/package.json ./microservices/identity-service/package.json
 
 # Install dependencies for all workspaces
 RUN npm install --workspaces
 
 # Copy source code and config files
-COPY libs ./libs
+COPY shared ./shared
 COPY microservices/identity-service ./microservices/identity-service
 COPY microservices/identity-service/tsconfig*.json ./
 
 # Build shared package first
-RUN npm run build --workspace=@timeboxing/libs
+RUN npm run build --workspace=@timeboxing/shared
 
 # Build identity-service
 RUN npm run build --workspace=identity-service
@@ -38,8 +38,8 @@ USER appuser
 # Copy built artifacts and package files
 COPY --from=builder --chown=appuser:appgroup /app/package*.json ./
 COPY --from=builder --chown=appuser:appgroup /app/node_modules ./node_modules
-COPY --from=builder --chown=appuser:appgroup /app/libs/package.json ./libs/package.json
-COPY --from=builder --chown=appuser:appgroup /app/libs/dist ./libs/dist
+COPY --from=builder --chown=appuser:appgroup /app/shared/package.json ./shared/package.json
+COPY --from=builder --chown=appuser:appgroup /app/shared/dist ./shared/dist
 COPY --from=builder --chown=appuser:appgroup /app/microservices/identity-service/package.json ./package.json
 COPY --from=builder --chown=appuser:appgroup /app/microservices/identity-service/dist ./dist
 COPY --from=builder --chown=appuser:appgroup /app/tsconfig*.json ./
