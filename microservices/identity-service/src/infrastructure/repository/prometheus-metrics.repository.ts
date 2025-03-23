@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { MetricsRepository } from '../../core/ports/metrics.repository';
+import { MetricsRepository } from '../../domain/repositories/metrics.repository';
 import {
   Registry,
   collectDefaultMetrics,

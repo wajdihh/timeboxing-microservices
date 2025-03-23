@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { HelloUseCase } from '../core/services/hello.usecase';
+import { HelloUseCase } from '../application/services/hello.service';
 import { InMemoryHelloRepository } from '../infrastructure/repository/in-memory-hello.repository';
-import { HelloController } from '../api/hello.controller';
+import { HelloController } from '../infrastructure/controllers/rest/hello.controller';
 
 @Module({
   controllers: [HelloController],

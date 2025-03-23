@@ -1,6 +1,6 @@
 import { NestMiddleware } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
-import { RequestContextService } from '../core/request-context.service';
+import { RequestContextService } from '../application/request-context.service';
 
 export class CorrelationIdMiddleware implements NestMiddleware {
     use(req: any, res: any, next: () => void) {

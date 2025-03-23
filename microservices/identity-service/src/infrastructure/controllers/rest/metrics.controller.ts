@@ -1,10 +1,8 @@
 import { Controller, Get, Req, Res, UseInterceptors } from '@nestjs/common';
-import { MetricsService } from '../core/services/metrics.service';
+import { MetricsService } from '../../../application/services/metrics.service';
 import { Request, Response } from 'express';
-import { LoggingInterceptor } from '../common/interceptors/logging.interceptor';
 
 @Controller('metrics')
-@UseInterceptors(LoggingInterceptor)
 export class MetricsController {
   constructor(private readonly metricsService: MetricsService) {}
 

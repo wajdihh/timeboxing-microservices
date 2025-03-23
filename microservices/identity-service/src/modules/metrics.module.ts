@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { MetricsController } from '../api/metrics.controller';
-import { MetricsService } from '../core/services/metrics.service';
+import { MetricsController } from '../infrastructure/controllers/rest/metrics.controller';
+import { MetricsService } from '../application/services/metrics.service';
 import { PrometheusMetricsRepository } from '../infrastructure/repository/prometheus-metrics.repository';
-import { METRICS_REPOSITORY_TOKEN } from '../core/ports/metrics.repository';
+import { METRICS_REPOSITORY_TOKEN } from '../domain/repositories/metrics.repository';
 
 @Module({
   controllers: [MetricsController],

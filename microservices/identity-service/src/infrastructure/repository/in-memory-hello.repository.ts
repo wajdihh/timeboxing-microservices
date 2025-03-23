@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { HelloMessage } from '../../core/domain/hello-message.entity';
-import { HelloRepository } from '../../core/ports/hello.repository';
-import { HelloDTO } from '../dto/hello-dto';
+import { HelloMessage } from '../../domain/entities/hello-message.entity';
+import { HelloRepository } from '../../domain/repositories/hello.repository';
+import { HelloDTO } from '../../application/dto/hello-dto';
 
 @Injectable()
 export class InMemoryHelloRepository implements HelloRepository {

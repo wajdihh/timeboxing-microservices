@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { MetricsRepository } from '../ports/metrics.repository';
+import { MetricsRepository } from '../../domain/repositories/metrics.repository';
 
 @Injectable()
 export class MetricsService {
