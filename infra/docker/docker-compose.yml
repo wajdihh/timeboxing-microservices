@@ -73,12 +73,8 @@ services:
       - .env.${NODE_ENV}
     environment:
       NODE_ENV: ${NODE_ENV}
-    volumes:
-      - ../../microservices/identity-service/src:/app/src #/src to avoid to enrase all /app folder , and src is used in hot reload watch mode
-      - ../../microservices/identity-service/logs:/app/logs # Mount logs directory for persistence
     depends_on:
       - prometheus
-# TODO: Add compose.override to add volume in case of development and remove it in production
 volumes:
   pgdata:
   grafana-storage:

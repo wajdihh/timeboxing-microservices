@@ -1,0 +1,5 @@
+services:
+  identity-service:
+    volumes:
+      - ../../microservices/identity-service/src:/app/src
+      - ../../microservices/identity-service/logs:/app/logs
