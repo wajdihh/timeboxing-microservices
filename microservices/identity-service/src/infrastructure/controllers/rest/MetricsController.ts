@@ -1,5 +1,5 @@
-import { Controller, Get, Req, Res, UseInterceptors } from '@nestjs/common';
-import { MetricsService } from '../../../application/services/MetricsService';
+import { Controller, Get, Req, Res } from '@nestjs/common';
+import { MetricsService } from '@identity/application/services/MetricsService';
 import { Request, Response } from 'express';
 
 @Controller('metrics')
@@ -13,10 +13,7 @@ export class MetricsController {
     try {
       const metrics = await this.metricsService.getMetrics();
 
-      res
-        .set('Content-Type', 'text/plain; version=0.0.4')
-        .status(200)
-        .send(metrics);
+      res.set('Content-Type', 'text/plain; version=0.0.4').status(200).send(metrics);
 
       this.metricsService.incrementRequestCounter(req.method, req.path, '200');
     } catch (error: unknown) {

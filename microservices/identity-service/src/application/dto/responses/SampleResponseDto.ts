@@ -1,4 +1,4 @@
-import { Sample } from '../../../domain/entities/Sample';
+import { Sample } from '@identity/domain/entities/Sample';
 
 export class SampleResponseDto {
   constructor(public readonly message: string) {}

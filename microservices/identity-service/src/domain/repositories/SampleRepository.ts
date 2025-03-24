@@ -1,4 +1,4 @@
-import { Sample } from '../entities/Sample';
+import { Sample } from '@identity/domain/entities/Sample';
 
 export interface SampleRepository {
   getMessage(): Promise<Sample>;

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { MetricsPort } from '../ports/MetricsPort';
+import { MetricsPort } from '@identity/application/ports/MetricsPort';
 
 @Injectable()
 export class MetricsService {

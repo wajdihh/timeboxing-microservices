@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body } from '@nestjs/common';
-import { SampleService } from '../../../application/services/SampleService';
-import { SampleRequestDto } from '../../../application/dto/requests/SampleRequestDto';
+import { SampleService } from '@identity/application/services/SampleService';
+import { SampleRequestDto } from '@identity/application/dto/requests/SampleRequestDto';
 
 @Controller('sample')
 export class SampleController {

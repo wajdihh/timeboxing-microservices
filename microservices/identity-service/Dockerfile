@@ -52,7 +52,7 @@ HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
 # Expose port
 EXPOSE ${PORT:-3000}
 
-# Command to run the app
+# Command to run the app TODO: delete all and keep node dist/main.js; and add npm run start:dev in docker comppose
 CMD if [ "$NODE_ENV" = "production" ]; then \
       node dist/main.js; \
     else \

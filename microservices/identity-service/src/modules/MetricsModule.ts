@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { MetricsController } from '../infrastructure/controllers/rest/MetricsController';
-import { MetricsService } from '../application/services/MetricsService';
-import { PrometheusMetricsAdapter } from '../infrastructure/adapters/external-services/PrometheusMetricsAdapter';
-//TODO: Replace ../infrastructure by @identity/infrastructure
+import { MetricsController } from '@identity/infrastructure/controllers/rest/MetricsController';
+import { MetricsService } from '@identity/application/services/MetricsService';
+import { PrometheusMetricsAdapter } from '@identity/infrastructure/adapters/external-services/PrometheusMetricsAdapter';
+
 @Module({
   controllers: [MetricsController],
   providers: [

@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { SampleService } from '../application/services/SampleService';
-import { SampleController } from '../infrastructure/controllers/rest/SampleController';
-import { InMemorySampleRepository } from '../infrastructure/adapters/database/InMemorySampleRepository';
-import { PrefixSampleAdapter } from '../infrastructure/adapters/external-services/PrefixSampleAdapter';
+import { SampleService } from '@identity/application/services/SampleService';
+import { SampleController } from '@identity/infrastructure/controllers/rest/SampleController';
+import { InMemorySampleRepository } from '@identity/infrastructure/adapters/database/InMemorySampleRepository';
+import { PrefixSampleAdapter } from '@identity/infrastructure/adapters/external-services/PrefixSampleAdapter';
 
 @Module({
   controllers: [SampleController],

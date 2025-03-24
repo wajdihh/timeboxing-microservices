@@ -18,6 +18,5 @@
     "noFallthroughCasesInSwitch": true,
     "esModuleInterop": true
   },
-  "include": ["src/**/*", "logging"],
   "exclude": ["node_modules", "dist"]
 }

@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { SamplePort } from '../ports/SamplePort';
-import { SampleRequestDto } from '../dto/requests/SampleRequestDto';
-import { SampleResponseDto } from '../dto/responses/SampleResponseDto';
-import { SampleRepository } from '../../domain/repositories/SampleRepository';
+import { SamplePort } from '@identity/application/ports/SamplePort';
+import { SampleRequestDto } from '@identity/application/dto/requests/SampleRequestDto';
+import { SampleResponseDto } from '@identity/application/dto/responses/SampleResponseDto';
+import { SampleRepository } from '@identity/domain/repositories/SampleRepository';
 @Injectable()
 export class SampleService {
   constructor(
