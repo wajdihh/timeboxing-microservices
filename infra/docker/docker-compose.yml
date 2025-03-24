@@ -78,7 +78,7 @@ services:
       - ../../microservices/identity-service/logs:/app/logs # Mount logs directory for persistence
     depends_on:
       - prometheus
-
+# TODO: Add compose.override to add volume in case of development and remove it in production
 volumes:
   pgdata:
   grafana-storage:

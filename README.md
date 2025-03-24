@@ -117,3 +117,6 @@ inside the root folder run
 
 > docker run --rm -it debug-builder sh (enter in SH mode in # Build stage )
 
+#### To organize 
+Use as template all related to HelloWord (Dto, Repo, Port etc..) by copy past
+

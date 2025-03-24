@@ -1,5 +1,5 @@
 import { Controller, Get, Req, Res, UseInterceptors } from '@nestjs/common';
-import { MetricsService } from '../../../application/services/metrics.service';
+import { MetricsService } from '../../../application/services/MetricsService';
 import { Request, Response } from 'express';
 
 @Controller('metrics')

@@ -1,15 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { MetricsRepository } from '../../domain/repositories/metrics.repository';
-import {
-  Registry,
-  collectDefaultMetrics,
-  Counter,
-  Histogram,
-} from 'prom-client';
+import { Registry, collectDefaultMetrics, Counter, Histogram } from 'prom-client';
+import { MetricsPort } from '../../../application/ports/MetricsPort';
 
 @Injectable()
-export class PrometheusMetricsRepository implements MetricsRepository {
-  private readonly logger = new Logger(PrometheusMetricsRepository.name);
+export class PrometheusMetricsAdapter implements MetricsPort {
+  private readonly logger = new Logger(PrometheusMetricsAdapter.name);
   public readonly register: Registry;
   private readonly requestCounter: Counter<string>;
   private readonly errorCounter: Counter<string>;

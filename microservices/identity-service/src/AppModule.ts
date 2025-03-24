@@ -1,10 +1,10 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { HelloModule } from './modules/hello.module';
-import { MetricsModule } from './modules/metrics.module';
+import { SampleModule } from './modules/SampleModule';
+import { MetricsModule } from './modules/MetricsModule';
 import { LoggingModule, CorrelationIdMiddleware } from '@timeboxing/shared';
-
+//ADD Import with @ like @identity
 @Module({
-  imports: [LoggingModule, HelloModule, MetricsModule],
+  imports: [LoggingModule, SampleModule, MetricsModule],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
