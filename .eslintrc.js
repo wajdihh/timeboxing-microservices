@@ -5,7 +5,6 @@ module.exports = {
     extends: [
       'eslint:recommended',
       'plugin:@typescript-eslint/recommended',
-      'plugin:filenames/recommended',
       'plugin:boundaries/recommended',
       'prettier'
     ],
@@ -16,7 +15,11 @@ module.exports = {
           { from: 'domain', allow: ['application'] },
           { from: 'application', allow: ['infrastructure'] }
         ]
-      }]
+      }],
+      //Enforce PascalCase file names with common suffixes
+    //'filenames/match-regex': [2, '^[A-Z][a-z0-9]+[A-Z][a-zA-Z0-9]*\\.ts$'],
+    //File name must match exported class or function
+    'filenames/match-exported': [2, null]
     },
     settings: {
       'boundaries/elements': [
@@ -26,4 +29,3 @@ module.exports = {
       ]
     }
   };
-  

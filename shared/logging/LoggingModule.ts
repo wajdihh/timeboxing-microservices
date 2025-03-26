@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { LoggerService } from './application/logger.service';
-import { CorrelationIdMiddleware } from './infrastructure/correlation-id.middleware';
-import { RequestContextService } from './application/request-context.service';
-import { ExecutionTimeInterceptor } from './application/execution-time.interceptor';
+import { LoggerService } from './application/LoggerService';
+import { CorrelationIdMiddleware } from './infrastructure/CorrelationIdMiddleware';
+import { RequestContextService } from './application/RequestContextService';
+import { ExecutionTimeInterceptor } from './application/ExecutionTimeInterceptor';
 
 @Module({
   providers: [

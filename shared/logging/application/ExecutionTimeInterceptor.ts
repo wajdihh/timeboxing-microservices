@@ -1,10 +1,10 @@
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from "@nestjs/common";
 import { Observable, tap } from "rxjs";
-import { RequestContextService } from "./request-context.service";
+import { RequestContextService } from "./RequestContextService";
 
 @Injectable()
 export class ExecutionTimeInterceptor implements NestInterceptor {
-    intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+    intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
         const now = Date.now();
         return next.handle().pipe(
           tap(() => {
