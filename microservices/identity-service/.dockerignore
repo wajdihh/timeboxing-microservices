@@ -1,13 +1,36 @@
+# Node and build artifacts
 node_modules
-npm-debug.log
-.env
-.env.*
 dist
-.git
-.vscode
-.idea
-*.md
+*.tsbuildinfo
+
+# Logs & temp files
 *.log
 *.tmp
 *.swp
+
+# Environment files
+.env
+.env.*
+.envrc
+
+# Editor/project metadata
+.vscode
+.idea
 .DS_Store
+
+# Git
+.git
+.gitignore
+
+# Testing/output
+coverage
+test-results/
+jest.config.js
+*.spec.ts
+*.test.ts
+
+# Docs & misc
+*.md
+LICENSE
+Makefile
+docker-compose.yml

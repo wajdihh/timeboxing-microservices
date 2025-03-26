@@ -7,14 +7,14 @@ WORKDIR /app
 COPY package.json ./
 COPY shared/package.json ./shared/package.json
 COPY microservices/identity-service/package.json ./microservices/identity-service/package.json
-
+COPY tsconfig.base.json ./
+COPY microservices/identity-service/tsconfig*.json ./
 # Install dependencies for all workspaces
 RUN npm install --workspaces
 
-# Copy source code and config files
-COPY shared ./shared
-COPY microservices/identity-service ./microservices/identity-service
-COPY microservices/identity-service/tsconfig*.json ./
+# Copy entire project structure maintaining paths
+COPY . .
+
 
 # Build shared package first
 RUN npm run build --workspace=@timeboxing/shared
@@ -52,9 +52,5 @@ HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
 # Expose port
 EXPOSE ${PORT:-3000}
 
-# Command to run the app TODO: delete all and keep node dist/main.js; and add npm run start:dev in docker comppose
-CMD if [ "$NODE_ENV" = "production" ]; then \
-      node dist/main.js; \
-    else \
-      npm run start:dev; \
-    fi
+# Clean, explicit production CMD
+CMD [ "node", "dist/main.js" ]

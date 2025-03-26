@@ -3,3 +3,4 @@ services:
     volumes:
       - ../../microservices/identity-service/src:/app/src
       - ../../microservices/identity-service/logs:/app/logs
+    command: npm run start:dev

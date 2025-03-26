@@ -110,5 +110,5 @@ npx husky-init && npm install
 - ✅ Layer boundaries strictly respected (Domain ← App ← Infra)
 - ✅ Easy to onboard developers and scale services
 - ✅ Faster CI and leaner Docker images
-
+TODO: MISSING BOUDNARY and other libs
 ---

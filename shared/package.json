@@ -10,16 +10,11 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@nestjs/common": "^11.0.1",
-    "@nestjs/core": "^11.0.1",
     "nest-winston": "^1.10.2",
-    "rxjs": "^7.0.0",
     "uuid": "^11.1.0",
     "winston": "^3.17.0"
   },
   "devDependencies": {
-    "@types/node": "^20.0.0",
-    "@types/uuid": "^10.0.0",
-    "typescript": "^5.0.0"
+    "@types/uuid": "^10.0.0"
   }
 }

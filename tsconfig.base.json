@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+      "target": "ES2021",
+      "module": "CommonJS",
+      "moduleResolution": "node",
+      "baseUrl": ".",
+      "strict": true,
+      "esModuleInterop": true,
+      "skipLibCheck": true,
+      "experimentalDecorators": true,
+      "emitDecoratorMetadata": true,
+      "useDefineForClassFields": false
+
+      
+    },
+    "include": ["shared/**/*", "microservices/**/*"]
+  }
