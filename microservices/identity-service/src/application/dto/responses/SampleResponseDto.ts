@@ -1,9 +1,9 @@
-import { Sample } from '@identity/domain/entities/Sample';
+import { SampleEntity } from '@identity/domain/entities/SampleEntity';
 
 export class SampleResponseDto {
   constructor(public readonly message: string) {}
 
   toDomain() {
-    return new Sample(this.message);
+    return new SampleEntity(this.message);
   }
 }

@@ -17,9 +17,12 @@ module.exports = {
         ]
       }],
       //Enforce PascalCase file names with common suffixes
-    //'filenames/match-regex': [2, '^[A-Z][a-z0-9]+[A-Z][a-zA-Z0-9]*\\.ts$'],
-    //File name must match exported class or function
-    'filenames/match-exported': [2, null]
+      'filenames/match-regex': [
+        'error',
+        '^[A-Z][A-Za-z0-9]+(Service|Controller|UseCase|Repository|Entity|Dto|Command|Query|Module|Adapter|Port)$',
+        true
+      ],
+     'filenames/match-exported': [2, 'pascal-case'],
     },
     settings: {
       'boundaries/elements': [
@@ -27,5 +30,15 @@ module.exports = {
         { type: 'application', pattern: 'src/application/*' },
         { type: 'infrastructure', pattern: 'src/infrastructure/*' }
       ]
-    }
+    },
+    //Ignore Tests for Filenames Rule
+    overrides: [
+      {
+        files: ['**/main.ts', '**/*.spec.ts', '**/*.e2e-spec.ts', '**/test/**'],
+        rules: {
+          'filenames/match-regex': 'off',
+          'filenames/match-exported': 'off'
+        }
+      }
+    ]
   };

@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { Sample } from '@identity/domain/entities/Sample';
+import { SampleEntity } from '@identity/domain/entities/SampleEntity';
 import { SampleRepository } from '@identity/domain/repositories/SampleRepository';
 
 @Injectable()
 export class InMemorySampleRepository implements SampleRepository {
-  getMessage(): Promise<Sample> {
+  getMessage(): Promise<SampleEntity> {
     console.log('Infra InMemoryHelloRepository: getMessage');
-    return Promise.resolve(Sample.create('Hello from Database'));
+    return Promise.resolve(SampleEntity.create('Hello from Database'));
   }
 
-  async setMessage(message: string): Promise<Sample> {
+  async setMessage(message: string): Promise<SampleEntity> {
     console.log('Infra InMemoryHelloRepository: setMessage');
-    return Promise.resolve(Sample.create(message));
+    return Promise.resolve(SampleEntity.create(message));
   }
 }
