@@ -1,5 +1,8 @@
 module.exports = {
     root: true,
+    env: {
+      node: true
+    },
     ignorePatterns: ['**/dist/**'],
     parser: '@typescript-eslint/parser',
     plugins: ['@typescript-eslint', 'filenames', 'boundaries', 'import'],
@@ -13,11 +16,8 @@ module.exports = {
       'boundaries/element-types': ['error', {
         default: 'disallow',
         rules: [
-          // Interfaces can call Application
-          { from: 'interfaces', allow: ['application'] },
-  
           // Application can call Domain and Infrastructure
-          { from: 'application', allow: ['domain', 'infrastructure'] },
+          { from: 'application', allow: ['domain'] },
   
           // Domain is pure — cannot import anything
           { from: 'domain', allow: [] },
@@ -31,7 +31,7 @@ module.exports = {
       //Enforce PascalCase file names with common suffixes
       'filenames/match-regex': [
         'error',
-        '^[A-Z][A-Za-z0-9]+(Service|Controller|UseCase|Repository|Entity|Dto|Command|Query|Module|Adapter|Port|Interceptor|Middleware|Util)$',
+        `^[A-Z][A-Za-z0-9]+(Service|Controller|UseCase|Repository|Entity|Dto|Filter|Module|Adapter|Port|Interceptor|Mapper|Middleware|Util|Value|Decorator|Exception|Error|Factory)$`,
         true
       ],
      'filenames/match-exported': [2, 'pascal-case'],
@@ -54,7 +54,7 @@ module.exports = {
     //Ignore Tests for Filenames Rule
     overrides: [
       {
-        files: ['**/main.ts','**/index.ts', '**/*.spec.ts', '**/*.e2e-spec.ts', '**/test/**'],
+        files: ['**/main.ts','**/index.ts','**/.eslintrc.js', '**/*.spec.ts', '**/*.e2e-spec.ts', '**/test/**'],
         rules: {
           'filenames/match-regex': 'off',
           'filenames/match-exported': 'off'

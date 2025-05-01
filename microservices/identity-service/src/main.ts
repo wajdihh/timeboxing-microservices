@@ -1,6 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './AppModule';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { setupSwagger } from '@timeboxing/shared';
+import { GlobalExceptionFilter } from '@timeboxing/shared';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -8,20 +10,20 @@ async function bootstrap() {
   // Enable CORS
   app.enableCors();
 
-  // Set API prefix (optional)
+  // Set API prefix
   app.setGlobalPrefix('api');
 
-  // Swagger API documentation
-  const config = new DocumentBuilder()
-    .setTitle('Identity Service API')
-    .setDescription('API documentation for the Identity Service')
-    .setVersion('1.0')
-    .addTag('Identity')
-    .build();
-  const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, documentFactory);
-
+  setupSwagger(app, {
+    path: 'api',
+    title: 'Identity Service',
+    description: 'Handles user registration, login, and authentication',
+    version: '1.0.0',
+  });
   const port = process.env.PORT ?? 3000;
+  //Catch Exceptions from domain layer or application layer
+  app.useGlobalFilters(new GlobalExceptionFilter());
+  // Enable validation pipe -> This will automatically validate incoming requests based on the DTOs
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
   await app.listen(port);
 
   console.log(`🚀 Server is running on port ` + port);

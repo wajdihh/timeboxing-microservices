@@ -5,7 +5,9 @@
   "description": "Shared utilities and modules for microservices",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc"
   },
@@ -15,6 +17,7 @@
     "winston": "^3.17.0"
   },
   "devDependencies": {
+    "@faker-js/faker": "^9.7.0",
     "@types/uuid": "^10.0.0"
   }
 }

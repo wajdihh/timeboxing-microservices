@@ -10,7 +10,7 @@ COPY microservices/identity-service/package.json ./microservices/identity-servic
 COPY tsconfig.base.json ./
 COPY microservices/identity-service/tsconfig*.json ./
 # Install dependencies for all workspaces
-RUN npm install --workspaces
+RUN npm install --legacy-peer-deps
 
 # Copy entire project structure maintaining paths
 COPY . .

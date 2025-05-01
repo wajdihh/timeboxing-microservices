@@ -1,0 +1,99 @@
+# ✅ ADR-005: Continuous Integration & Delivery (CI/CD)
+
+## 🎯 Decision
+
+We adopt **CI/CD automation** for all microservices in the Timeboxing monorepo to enforce consistent quality, enable rapid iteration, and prepare for cloud-native deployment.
+
+We use **GitHub Actions** as our CI/CD orchestrator and Docker-based deployment locally, with the possibility to migrate later to managed services like AWS ECS, GCP Cloud Run, or Railway.
+
+---
+
+## 🔧 CI Goals
+
+* ⏱️ Fast feedback via automated lint/test/coverage
+* ✅ Enforced code quality for every PR
+* 🧪 Reliable test & type checking pipelines
+* 🔐 Secure and observable runtime artifacts
+
+## 🚀 CD Goals
+
+* 🔁 Local end-to-end bootstrapping using `Docker Compose`
+* 📦 Image publishing for future staging/prod environments
+* 🧰 Infrastructure versioning via Git
+
+---
+
+## 🧱 CI/CD Workflow Structure (Generic)
+
+```plaintext
+📦 Push/PR on main or feature/*
+│
+├── 🧹 Pre-checks: Lint + Format
+├── ✅ Unit Tests (Jest)
+├── 🔍 Type Check (tsc)
+├── 🔁 Monorepo Caching
+├── 🐳 Build Docker Images
+└── 🟢 (Optional) Deploy Locally or Publish Artifacts
+```
+
+---
+
+### 🔄 Monorepo Cache (CI Optimization)
+
+**Why:**
+Monorepos with many services can lead to slow CI due to repeated installs and builds.
+
+**Strategy:**
+
+* Use GitHub `actions/cache` or another CI cache layer
+* Cache:
+
+  * `node_modules` per service
+  * `dist/` or build outputs
+  * lockfiles (e.g. `package-lock.json`, `tsconfig.base.json`)
+* Optional future: adopt `turbo` or Nx to enable granular task graph-based caching
+
+**Outcome:**
+
+* ⚡ Faster PR feedback (30–70% faster)
+* 📉 Reduced redundant builds
+
+---
+
+## 🛠️ Included CI Features
+
+| Feature               | Tooling                         | Description                                |
+| --------------------- | ------------------------------- | ------------------------------------------ |
+| Linting               | `eslint`                        | Enforces style, DDD rules, hexagonal rules |
+| Type checking         | `tsc --noEmit`                  | Validates TS types across services         |
+| Testing               | `jest`                          | Unit tests across microservices            |
+| Git Hooks (optional)  | `husky + lint-staged`           | Pre-commit format/lint guard               |
+| Docker build          | `Dockerfile` + `docker-compose` | Build & run locally all services           |
+| Reusable CI Workflows | GitHub Actions                  | Modular jobs per service                   |
+
+---
+
+## 📂 Folder Structure
+
+```plaintext
+/.github/workflows/ci.yml       → Shared CI pipeline definition
+/infra/docker/                  → Local Docker Compose, .envs
+shared/                         → Shared codebase, lint config
+microservices/                  → All services (independent build/test)
+```
+
+> Note: Local CD is triggered manually via `docker compose up` for now.
+
+---
+
+## 📌 Summary
+
+* ✅ Modular, generic GitHub Actions pipeline
+* 🧪 CI on every commit + PR
+* 🐳 Docker-based CD with local-first setup
+* 🔄 Monorepo cache optimization included
+* ⚙️ Git Hooks and Lint Guards recommended
+
+> This ADR is intentionally **generic** and does not embed live `ci.yml` details, which may evolve over time.
+
+---

@@ -9,7 +9,7 @@ build:
   # Build Docker containers
   docker-compose -f infra/docker/docker-compose.yml -f infra/docker/docker-compose.override.yml --env-file infra/docker/.env.sample build
 
-# Build a specific service
+# Build a specific service (e.g., "just build identity-service")
 build-service service:
   docker-compose -f infra/docker/docker-compose.yml -f infra/docker/docker-compose.override.yml --env-file infra/docker/.env.sample build {{service}}
 
@@ -23,7 +23,7 @@ up env='local':
 down:
   docker-compose -f infra/docker/docker-compose.yml -f infra/docker/docker-compose.override.yml --env-file infra/docker/.env.sample down --remove-orphans
 
-# Restart a specific service (e.g., "just restart identity-service" )
+# Restart a specific service (e.g., "just restart-service identity-service")
 restart-service service env='local':
   docker-compose -f infra/docker/docker-compose.yml -f infra/docker/docker-compose.override.yml --env-file infra/docker/.env.{{env}} restart {{service}} && docker-compose -f infra/docker/docker-compose.yml --env-file infra/docker/.env.{{env}} logs -f {{service}}
 
@@ -38,28 +38,32 @@ clean-npm:
   rm -rf microservices/identity-service/node_modules
   npm cache clean --force
 
+# Install NPM packages
+install-npm:
+  npm install --legacy-peer-deps
+  npm run build
 
-# Clean a specific service (remove containers and images)
+# Clean a specific service (remove containers and images) e.g., "just clean-service identity-service")
 clean-service service:
   docker-compose -f infra/docker/docker-compose.yml -f infra/docker/docker-compose.override.yml --env-file infra/docker/.env.sample down -v --remove-orphans {{service}} && docker system prune -f && docker image prune -f
 
-# Start a specific service in a selected environment (e.g., "just start identity-service")
+# Start a specific service in a selected environment (e.g., "just start-service identity-service")
 start-service service env='local':
   docker-compose -f infra/docker/docker-compose.yml -f infra/docker/docker-compose.override.yml --env-file infra/docker/.env.{{env}} up -d {{service}}
 
-# Stop a specific service in a selected environment (e.g., "just stop identity-service")
+# Stop a specific service in a selected environment (e.g., "just stop-service identity-service")
 stop-service service env='local':
   docker-compose -f infra/docker/docker-compose.yml -f infra/docker/docker-compose.override.yml --env-file infra/docker/.env.{{env}} down {{service}}
 
-# View logs for a specific service (e.g., "just logs identity-service")
+# View logs for a specific service (e.g., "just logs-service identity-service")
 logs-service service:
   docker-compose -f infra/docker/docker-compose.yml -f infra/docker/docker-compose.override.yml --env-file infra/docker/.env.sample logs -f {{service}}
 
-# View logs for all services
+# View logs for all services eg. (e.g., "just logs-all")
 logs-all:
   docker-compose -f infra/docker/docker-compose.yml -f infra/docker/docker-compose.override.yml --env-file infra/docker/.env.sample logs -f
 
-# Enter in Exec cmd inside the container (e.g., "just exec identity-service")
+# Enter in Exec cmd inside the container (e.g., "just exec-service identity-service")
 exec-service service:
   docker exec -it {{service}} sh
 
