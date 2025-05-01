@@ -120,3 +120,13 @@ inside the root folder run
 #### To organize 
 Use as template all related to HelloWord (Dto, Repo, Port etc..) by copy past
 
+#### To run in the root folder 
+rm -rf node_modules
+rm package-lock.json
+npm install
+
+# Build shared first
+npm run build -w @timeboxing/shared
+
+# Then identity-service
+npm run build -w identity-service
