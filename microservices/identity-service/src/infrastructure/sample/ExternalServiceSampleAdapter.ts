@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { SamplePort } from '@identity/application/ports/SamplePort';
+import { SamplePort } from '@identity/application/sample/SamplePort';
 
 @Injectable()
 export class PrefixSampleAdapter implements SamplePort {

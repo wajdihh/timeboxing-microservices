@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { SampleEntity } from '@identity/domain/entities/SampleEntity';
-import { SampleRepository } from '@identity/domain/repositories/SampleRepository';
+import { SampleEntity } from '@identity/domain/sample/SampleEntity';
+import { SampleRepository } from '@identity/domain/sample/SampleRepository';
 
 @Injectable()
 export class InMemorySampleRepository implements SampleRepository {

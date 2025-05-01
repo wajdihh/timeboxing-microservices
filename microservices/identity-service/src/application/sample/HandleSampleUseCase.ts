@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { SamplePort } from '@identity/application/ports/SamplePort';
-import { SampleRequestDto } from '@identity/application/dto/requests/SampleRequestDto';
-import { SampleResponseDto } from '@identity/application/dto/responses/SampleResponseDto';
-import { SampleRepository } from '@identity/domain/repositories/SampleRepository';
+import { SamplePort } from '@identity/application/sample/SamplePort';
+import { SampleRequestDto } from '@identity/application/sample/dto/SampleRequestDto';
+import { SampleResponseDto } from '@identity/application/sample/dto/SampleResponseDto';
+import { SampleRepository } from '@identity/domain/sample/SampleRepository';
 @Injectable()
-export class SampleService {
+export class HandleSampleUseCase {
   constructor(
     private readonly sampleRepository: SampleRepository,
     private readonly samplePort: SamplePort,

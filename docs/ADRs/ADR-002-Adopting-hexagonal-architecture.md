@@ -1,22 +1,26 @@
-
-
 # ✅ ADR-002: Hexagonal Architecture & Naming Conventions
 
-## 🎯 Decision
+## 🌟 Decision
 
-We adopt **Hexagonal Architecture (Ports & Adapters)** for all microservices, with standardized **file naming conventions** aligned with the **NestJS + TypeScript community**.
-
-This architecture separates the system into:
+We adopt **Hexagonal Architecture (Ports & Adapters)** for all microservices, with standardized **file naming conventions** aligned with the **NestJS + TypeScript + DDD community**.
+This includes using the suffix `UseCase` for all application-layer use case classes, and organizing code **by layer first**, then **by feature** within each layer.
 
 ---
 
+## 💡 Architecture Layers Overview
+
 ### 🟩 1. Domain Layer
-- **What:** Core business logic (entities, rules, value objects)
+- **What:** Core business rules, pure logic
 - **No NestJS, DB, or HTTP dependencies**
-- **File Naming:** `PascalCase.ts`
+- **Contents:**
+  - Entities
+  - Value Objects
+  - Domain Exceptions
+  - Domain Repositories (interfaces only)
+- **Naming:** `PascalCase.ts`
 
 **Examples:**
-```plaintext
+```
 Task.ts                          → class Task  
 TaskRepository.ts                → interface TaskRepository  
 TaskStatus.ts                    → enum TaskStatus  
@@ -25,28 +29,39 @@ InvalidTaskStatusException.ts    → class InvalidTaskStatusException
 
 ---
 
-### 🟦 2. Application Layer
-- **What:** Use-case orchestration, domain coordination, and external port definitions
-- **File Naming:**  
-  - Use-case services: `PascalCaseService.ts`  
-  - Ports (non-persistence): `PascalCasePort.ts`  
+### 🗭 2. Application Layer
+- **What:** Use case orchestration, ports, and DTOs
+- **Contains:**
+  - `UseCases`: Application services implementing business workflows
+  - `Ports`: Interfaces needed by the application
+  - `DTOs`: Structured input/output objects
+- **Naming:**  
+  - Use cases: `PascalCaseUseCase.ts`  
+  - Ports: `PascalCasePort.ts`  
   - DTOs: `PascalCaseDto.ts`
 
 **Examples:**
-```plaintext
-CreateTaskService.ts            → class CreateTaskService  
-NotificationPort.ts             → interface NotificationPort  
-CreateTaskRequestDto.ts         → interface CreateTaskRequestDto  
 ```
+CreateTaskUseCase.ts             → class CreateTaskUseCase  
+NotificationPort.ts              → interface NotificationPort  
+CreateTaskRequestDto.ts          → interface CreateTaskRequestDto  
+```
+
+- **Port In (Driving Port):** Optional interface for each use case (e.g., `ICreateTaskUseCase`) — helpful in strict DDD or for mocking.
+- **Port Out (Driven Port):** Mandatory interface to describe outbound dependencies (`NotificationPort`, `TaskRepository`, etc.)
 
 ---
 
-### 🟥 3. Infrastructure Layer
-- **What:** NestJS controllers, DB adapters, external service clients
-- **File Naming:** `PascalCaseSuffix.ts` (e.g., `TaskController.ts`, `PrismaTaskRepository.ts`, `EmailNotificationAdapter.ts`)
+### 🔵 3. Infrastructure Layer
+- **What:** NestJS controllers, DB clients, external integrations
+- **Contains:**
+  - Controllers (REST, Socket)
+  - Adapters (DB, HTTP, Mail, etc.)
+  - NestJS Modules and Configs
+- **Naming:** `PascalCaseSuffix.ts` (e.g., `TaskController.ts`, `EmailNotificationAdapter.ts`)
 
 **Examples:**
-```plaintext
+```
 TaskController.ts               → class TaskController  
 PrismaTaskRepository.ts         → class PrismaTaskRepository implements TaskRepository  
 EmailNotificationAdapter.ts     → class EmailNotificationAdapter implements NotificationPort  
@@ -54,28 +69,18 @@ EmailNotificationAdapter.ts     → class EmailNotificationAdapter implements No
 
 ---
 
-## Flow
-
-Depending on the purpose of the interaction, the application service can route to either a **Domain Repository** or an **Application Port**:
+## ⚡ Use Case Flow
 
 ```plaintext
-📦 Controller
-   ↓
-📘 Application Service
-   ↓
-1️⃣ Domain Port (e.g., TaskRepository)
-   ↓
+📦 Controller (REST/SOCKET)
+    ↓
+📘 Application UseCase (e.g., CreateTaskUseCase)
+    ↓
+1️⃣ Domain Repository or Application Port
+    ↓
 🔌 Infrastructure Adapter (e.g., PrismaTaskRepository)
-   ↓
-🗄️ External System (e.g., DB)
-
-OR
-
-2️⃣ Application Port (e.g., NotificationPort)
-   ↓
-🔌 Infrastructure Adapter (e.g., EmailNotificationAdapter)
-   ↓
-🌍 External System (e.g., Mailgun)
+    ↓
+💽 External System (e.g., DB, Mailgun)
 ```
 
 | Case                          | Port Type         | Example                                |
@@ -85,29 +90,39 @@ OR
 
 ---
 
-## 📁 Recommended Folder Structure
+## 📁 Recommended Folder Structure (By Layer > By Feature)
 
 ```plaintext
 src/
 ├── domain/
-│   ├── entities/                → Task.ts
-│   ├── repositories/            → TaskRepository.ts
-│   ├── value-objects/           → TaskStatus.ts
-│   └── exceptions/              → InvalidTaskStatusException.ts
+│   ├── task/
+│   │   ├── entities/                → Task.ts
+│   │   ├── repositories/            → TaskRepository.ts
+│   │   ├── value-objects/           → TaskStatus.ts
+│   │   └── exceptions/              → InvalidTaskStatusException.ts
+│   └── user/
+│       └── ...
 
 ├── application/
-│   ├── services/                → CreateTaskService.ts
-│   ├── dto/                     → CreateTaskRequestDto.ts
-│   └── ports/                   → NotificationPort.ts
+│   ├── task/
+│   │   ├── use-cases/               → CreateTaskUseCase.ts
+│   │   ├── ports/                   → NotificationPort.ts
+│   │   └── dto/                     → CreateTaskRequestDto.ts
+│   └── user/
+│       └── ...
 
 └── infrastructure/
-    ├── controllers/
-    │   ├── rest/                → TaskController.ts
-    │   └── sockets/             → TaskSocketGateway.ts
-    ├── adapters/
-    │   ├── database/            → PrismaTaskRepository.ts
-    │   └── external-services/   → EmailNotificationAdapter.ts
-    └── config/                  → AppModule.ts
+    ├── task/
+    │   ├── controllers/
+    │   │   ├── rest/            → TaskController.ts
+    │   │   └── sockets/         → TaskSocketGateway.ts
+    │   ├── adapters/
+    │   │   ├── database/        → PrismaTaskRepository.ts
+    │   │   └── external-services/
+    │   │       → EmailNotificationAdapter.ts
+    │   └── config/                  → AppModule.ts
+    └── user/
+        └── ...
 ```
 
 ---
@@ -118,7 +133,7 @@ src/
 |----------------|--------------------------------|-----------------------------|------------------------------|
 | Domain         | `TaskRepository.ts`            | `interface TaskRepository`  | Persistence port             |
 | Application    | `NotificationPort.ts`          | `interface NotificationPort`| External system port         |
-| Application    | `CreateTaskService.ts`         | `CreateTaskService`         | Use-case logic               |
+| Application    | `CreateTaskUseCase.ts`         | `CreateTaskUseCase`         | Use-case logic               |
 | Infrastructure | `PrismaTaskRepository.ts`      | `PrismaTaskRepository`      | Implements domain repository |
 | Infrastructure | `EmailNotificationAdapter.ts`  | `EmailNotificationAdapter`  | Implements application port  |
 

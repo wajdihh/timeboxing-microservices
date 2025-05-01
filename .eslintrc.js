@@ -22,8 +22,8 @@ module.exports = {
           // Domain is pure — cannot import anything
           { from: 'domain', allow: [] },
   
-          // Infrastructure may only call Application (for adapter implementations)
-          { from: 'infrastructure', allow: ['application'] },
+          // Infrastructure may only call Application and domain(for Port & repository implementations)
+          { from: 'infrastructure', allow: ['domain','application'] },
           // block unknown → unknown
           { from: '*', allow: [], message: 'Unknown layer import blocked' }
         ]
