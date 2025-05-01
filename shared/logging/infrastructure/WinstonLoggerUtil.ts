@@ -1,6 +1,6 @@
 import { createLogger,format, transports } from "winston";
 
-export const winstonLogger = createLogger({
+export const WinstonLoggerUtil = createLogger({
   level: "info",    // Log only if level is less than or equal to this level
   format: format.combine(   // Combine multiple formats into a single format
     format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),   // Add a timestamp to each log entry       

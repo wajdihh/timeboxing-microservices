@@ -6,8 +6,10 @@
     "microservices/*"
   ],
   "scripts": {
+    "build": "npm run build -w @timeboxing/shared && npm run build -w identity-service",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
+    "lint:strict": "eslint . --ext .ts --max-warnings 0",
     "test": "jest --projects microservices/*"
   },
   "dependencies": {

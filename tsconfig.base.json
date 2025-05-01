@@ -4,6 +4,12 @@
       "module": "CommonJS",
       "moduleResolution": "node",
       "baseUrl": ".",
+      "paths": {
+       "@identity/domain/*": ["microservices/identity-service/src/domain/*"],
+       "@identity/application/*": ["microservices/identity-service/src/application/*"],
+       "@identity/infrastructure/*": ["microservices/identity-service/src/infrastructure/*"],
+       "@identity/interfaces/*": ["microservices/identity-service/src/interfaces/*"]
+      },
       "strict": true,
       "esModuleInterop": true,
       "skipLibCheck": true,

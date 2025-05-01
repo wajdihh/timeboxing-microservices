@@ -1,10 +1,10 @@
-import { Injectable, Logger, Scope } from '@nestjs/common';
-import { winstonLogger } from '../infrastructure/winstonLogger';
+import { Injectable, Scope } from '@nestjs/common';
+import { WinstonLoggerUtil } from '../infrastructure/WinstonLoggerUtil';
 import { RequestContextService } from './RequestContextService';
 
 @Injectable({ scope: Scope.TRANSIENT })
 export class LoggerService {
-  private readonly logger = winstonLogger;
+  private readonly logger = WinstonLoggerUtil;
 
   log(message: string, context?: string) {
     message= this.buildMessageWithCorrelationId(message);

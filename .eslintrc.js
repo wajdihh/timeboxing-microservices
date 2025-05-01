@@ -1,5 +1,6 @@
 module.exports = {
     root: true,
+    ignorePatterns: ['**/dist/**'],
     parser: '@typescript-eslint/parser',
     plugins: ['@typescript-eslint', 'filenames', 'boundaries'],
     extends: [
@@ -12,29 +13,44 @@ module.exports = {
       'boundaries/element-types': ['error', {
         default: 'disallow',
         rules: [
-          { from: 'domain', allow: ['application'] },
-          { from: 'application', allow: ['infrastructure'] }
+          // Interfaces can call Application
+          { from: 'interfaces', allow: ['application'] },
+  
+          // Application can call Domain and Infrastructure
+          { from: 'application', allow: ['domain', 'infrastructure'] },
+  
+          // Domain is pure — cannot import anything
+          { from: 'domain', allow: [] },
+  
+          // Infrastructure may only call Application (for adapter implementations)
+          { from: 'infrastructure', allow: ['application'] },
+          // block unknown → unknown
+          { from: '*', allow: [], message: 'Unknown layer import blocked' }
         ]
       }],
       //Enforce PascalCase file names with common suffixes
       'filenames/match-regex': [
         'error',
-        '^[A-Z][A-Za-z0-9]+(Service|Controller|UseCase|Repository|Entity|Dto|Command|Query|Module|Adapter|Port)$',
+        '^[A-Z][A-Za-z0-9]+(Service|Controller|UseCase|Repository|Entity|Dto|Command|Query|Module|Adapter|Port|Interceptor|Middleware|Util)$',
         true
       ],
      'filenames/match-exported': [2, 'pascal-case'],
     },
     settings: {
       'boundaries/elements': [
-        { type: 'domain', pattern: 'src/domain/*' },
-        { type: 'application', pattern: 'src/application/*' },
-        { type: 'infrastructure', pattern: 'src/infrastructure/*' }
-      ]
+        { type: 'domain', pattern: '**/src/domain/*' },
+        { type: 'application', pattern: '**/src/application/*' },
+        { type: 'infrastructure', pattern: '**/src/infrastructure/*' },
+        { type: 'interfaces', pattern: '**/src/interfaces/*' },
+        { type: 'shared', pattern: 'shared/src/*' }
+      ],
+      'boundaries/include': ['src'],
+      'boundaries/ignore': ['**/*.spec.ts']
     },
     //Ignore Tests for Filenames Rule
     overrides: [
       {
-        files: ['**/main.ts', '**/*.spec.ts', '**/*.e2e-spec.ts', '**/test/**'],
+        files: ['**/main.ts','**/index.ts', '**/*.spec.ts', '**/*.e2e-spec.ts', '**/test/**'],
         rules: {
           'filenames/match-regex': 'off',
           'filenames/match-exported': 'off'
