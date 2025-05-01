@@ -2,7 +2,7 @@ module.exports = {
     root: true,
     ignorePatterns: ['**/dist/**'],
     parser: '@typescript-eslint/parser',
-    plugins: ['@typescript-eslint', 'filenames', 'boundaries'],
+    plugins: ['@typescript-eslint', 'filenames', 'boundaries', 'import'],
     extends: [
       'eslint:recommended',
       'plugin:@typescript-eslint/recommended',
@@ -38,14 +38,18 @@ module.exports = {
     },
     settings: {
       'boundaries/elements': [
-        { type: 'domain', pattern: '**/src/domain/*' },
-        { type: 'application', pattern: '**/src/application/*' },
-        { type: 'infrastructure', pattern: '**/src/infrastructure/*' },
-        { type: 'interfaces', pattern: '**/src/interfaces/*' },
-        { type: 'shared', pattern: 'shared/src/*' }
+        { type: 'domain', pattern: 'microservices/*/src/domain/**' },
+        { type: 'application', pattern: 'microservices/*/src/application/**' },
+        { type: 'infrastructure', pattern: 'microservices/*/src/infrastructure/**' },
+        { type: 'interfaces', pattern: 'microservices/*/src/interfaces/**' },
+        { type: 'shared', pattern: 'shared/src/**' }
       ],
-      'boundaries/include': ['src'],
-      'boundaries/ignore': ['**/*.spec.ts']
+      'boundaries/ignore': ['**/*.spec.ts'],
+      'import/resolver': {
+          typescript: {
+          project: './tsconfig.base.json'
+    }
+  }
     },
     //Ignore Tests for Filenames Rule
     overrides: [
