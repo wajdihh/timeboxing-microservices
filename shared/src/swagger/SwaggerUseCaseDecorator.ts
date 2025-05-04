@@ -2,6 +2,7 @@
 import { applyDecorators, Type } from '@nestjs/common';
 import { ApiBody, ApiResponse } from '@nestjs/swagger';
 import { BaseDomainError } from '../errors/BaseDomainError';
+import { DomainHttpCode } from '../errors';
 
 /**
  * 
@@ -34,11 +35,18 @@ export function SwaggerUseCase(useCaseClass: Type<unknown>) {
     );
   }
 
-  // Response with example (201)
-  if (response?.sample) {
+  // Response with example (204 No Content or 200/201 OK)
+  if (successStatus === DomainHttpCode.NO_CONTENT) {
     decorators.push(
       ApiResponse({
-        status: successStatus,
+        status: DomainHttpCode.NO_CONTENT,
+        description: 'No content',
+      })
+    );
+  } else if (response?.sample) {
+    decorators.push(
+      ApiResponse({
+        status: successStatus ?? DomainHttpCode.OK,
         description: 'Success',
         schema: {
           example: response.sample(),
