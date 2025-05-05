@@ -5,6 +5,7 @@ import { UserNotFoundError } from "@identity/domain/user/errors/UserNotFoundErro
 import { DomainHttpCode, ResultValue, SwaggerUseCaseMetadata } from "@timeboxing/shared";
 import { InvalidEmailError } from "@identity/domain/user/errors/InvalidEmailError";
 import { RegisterUserMapper } from "./mappers/RegisterUserMapper";
+import { EmailValue } from "@identity/domain/user/value-objects/EmailValue";
 
 @SwaggerUseCaseMetadata({
     errors: [UserNotFoundError, InvalidEmailError],
@@ -18,18 +19,20 @@ export class GetUserUseCase {
 
     async execute(email: string): Promise<ResultValue<UserResponseDto, UserNotFoundError | InvalidEmailError>> {
 
-        const userResult = await this.userRepository.findByEmail(email);
+        const emailResult = EmailValue.create(email);
         // 1. Invalid email format
-        if (!userResult.isOk) {
-            return ResultValue.error(userResult.error);
+        if (!emailResult.isOk) {
+            return ResultValue.error(new InvalidEmailError(email));
         }
-        const user = userResult.unwrap();
+        const emailValue = emailResult.unwrap();
+        const userResult = await this.userRepository.findByEmail(emailValue);
+        const userValue = userResult.unwrap();
         // 2. User not found
-        if (!user) {
+        if (!userValue) {
             return ResultValue.error(new UserNotFoundError(email));
         }
 
-        const response = RegisterUserMapper.toResponse(user);
+        const response = RegisterUserMapper.toResponse(userValue);
         return ResultValue.ok(response);
 
     }

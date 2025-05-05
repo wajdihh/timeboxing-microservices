@@ -1,27 +1,35 @@
 {
   "name": "identity-service",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start": "nest start",
-    "start:dev": "nest start --watch",
-    "start:debug": "node --inspect=0.0.0.0:9230 dist/main.js",
-    "start:prod": "node dist/main",
+    "start": "tools/with-env.sh node dist/main.js",
+    "start:dev": "tools/with-env.sh nest start --watch",
+    "start:debug": "tools/with-env.sh node --inspect=0.0.0.0:9230 dist/main.js",
+    "start:prod": "tools/with-env.sh node dist/main.js",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:cov": "jest --coverage",
-    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test": "tools/with-env.sh jest",
+    "test:watch": "tools/with-env.sh jest --watch",
+    "test:cov": "tools/with-env.sh jest --coverage",
+    "test:debug": "tools/with-env.sh node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "test:e2e": "tools/with-env.sh jest --config ./test/jest-e2e.json",
+    "prisma:generate": "tools/with-env.sh prisma generate",
+    "prisma:migrate": "tools/with-env.sh prisma migrate dev",
+    "prisma:pull": "tools/with-env.sh prisma db pull",
+    "showenv": "tools/with-env.sh bash -c 'echo DATABASE_URL=$DATABASE_URL'"
   },
   "dependencies": {
+    "@prisma/client": "^6.7.0",
     "@timeboxing/shared": "*",
     "bcrypt": "^5.1.0"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "dotenv-cli": "^8.0.0",
+    "prisma": "^6.7.0"
   },
   "jest": {
     "moduleFileExtensions": [
@@ -39,8 +47,5 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
-  },
-  "devDependencies": {
-    "@types/bcrypt": "^5.0.2"
   }
 }

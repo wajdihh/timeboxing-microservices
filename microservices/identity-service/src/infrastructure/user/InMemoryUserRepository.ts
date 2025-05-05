@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { UserEntity } from '@identity/domain/user/UserEntity';
 import { UserRepository } from '@identity/domain/user/UserRepository';
 import { EmailValue } from '@identity/domain/user/value-objects/EmailValue';
-import { InvalidEmailError } from '@identity/domain/user/errors/InvalidEmailError';
 import { ResultValue } from '@timeboxing/shared';
 
 @Injectable()
@@ -10,15 +9,9 @@ export class InMemoryUserRepository implements UserRepository {
 
     private users: UserEntity[] = [];
 
-    async findByEmail(email: string): Promise<ResultValue<UserEntity | null, InvalidEmailError>>{
-        const emailResult = EmailValue.create(email);
+    async findByEmail(email: EmailValue): Promise<ResultValue<UserEntity | null>>{
 
-        if (!emailResult.isOk) {
-            return ResultValue.error(emailResult.error);
-        }
-        
-        const emailValue = emailResult.unwrap();
-        const user = this.users.find(user => user.email.equals(emailValue));
+        const user = this.users.find(user => user.email.equals(email));
         
         return ResultValue.ok(user ?? null);
     }
@@ -28,5 +21,5 @@ export class InMemoryUserRepository implements UserRepository {
         this.users.push(user);
         return Promise.resolve();}
         
-        //TODO: To replace with DB
+        //TODO: To replace by mock and see if it's relavant to keep it
 }

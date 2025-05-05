@@ -1,16 +1,18 @@
 import { Module } from '@nestjs/common';
 import { UserController } from './UserController';
-import { InMemoryUserRepository } from './InMemoryUserRepository';
 import { RegisterUserUseCase } from '@identity/application/user/RegisterUserUseCase';
 import { BcryptPasswordAdapter } from '../security/BcryptPasswordAdapter';
 import { GetUserUseCase } from '@identity/application/user/GetUserUseCase';
+import { PrismaUserRepository } from './PrismaUserRepository';
+import { PrismaService } from '../prisma/PrismaService';
 
 @Module({
   controllers: [UserController],
   providers: [
+    PrismaService,
     {
-      provide: 'InMemoryUserRepository',
-      useClass: InMemoryUserRepository,
+      provide: 'PrismaUserRepository',
+      useClass: PrismaUserRepository,
     },
     {
           provide: 'BcryptPasswordAdapter',
@@ -18,15 +20,15 @@ import { GetUserUseCase } from '@identity/application/user/GetUserUseCase';
     },
     {
       provide: RegisterUserUseCase,
-      useFactory: (repo: InMemoryUserRepository, port: BcryptPasswordAdapter) =>
+      useFactory: (repo: PrismaUserRepository, port: BcryptPasswordAdapter) =>
       new RegisterUserUseCase(repo, port),
-      inject: ['InMemoryUserRepository', 'BcryptPasswordAdapter'],
+      inject: ['PrismaUserRepository', 'BcryptPasswordAdapter'],
     },
     {
       provide: GetUserUseCase,
-      useFactory: (repo: InMemoryUserRepository) =>
+      useFactory: (repo: PrismaUserRepository) =>
       new GetUserUseCase(repo),
-      inject: ['InMemoryUserRepository'],
+      inject: ['PrismaUserRepository'],
     },
   ],
 })

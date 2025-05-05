@@ -13,11 +13,28 @@ build:
 build-service service:
   docker-compose -f infra/docker/docker-compose.yml -f infra/docker/docker-compose.override.yml --env-file infra/docker/.env.sample build {{service}}
 
-# Start services in a selected environment (e.g., "local by default or add arg like dev, staging, prod")
+# Start all services in a selected environment (e.g., "local by default or add arg like dev, staging, prod" eg.. "just up")
 up env='local':
   @echo "Checking if Docker is running..."
+  @docker info > /dev/null 2>&1 || { echo " Docker is not running. Please start Docker and try again."; exit 1; }
+
+  @echo "🐳 Starting infrastructure (Postgres, Grafana, Prometheus)..."
+  NODE_ENV={{env}} docker-compose \
+    -f infra/docker/docker-compose.yml \
+    -f infra/docker/docker-compose.override.yml \
+    --env-file infra/docker/.env.{{env}} \
+    up --build -d postgres grafana prometheus cadvisor
+
+  @echo "🚀 Starting identity-service locally with NODE_ENV={{env}}"
+  #Run the identity-service locally
+  cd microservices/identity-service && NODE_ENV={{env}} npm run start:dev
+
+
+# Start services in a selected environment (e.g., "local by default or add arg like dev, staging, prod" eg.. "just up-service identity-service")
+up-service service env='local':
+  @echo "Checking if Docker is running..."
   @docker info > /dev/null 2>&1 || { echo "Docker is not running. Please start Docker and try again."; exit 1; }
-  NODE_ENV={{env}} docker-compose -f infra/docker/docker-compose.yml -f infra/docker/docker-compose.override.yml --env-file infra/docker/.env.{{env}} up --build -d
+  NODE_ENV={{env}} docker-compose -f infra/docker/docker-compose.yml -f infra/docker/docker-compose.override.yml --env-file infra/docker/.env.{{env}} up -d {{service}}
 
 # Stop all services
 down:

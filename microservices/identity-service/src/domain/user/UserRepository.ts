@@ -1,8 +1,8 @@
 import { ResultValue } from "@timeboxing/shared";
 import { UserEntity } from "./UserEntity";
-import { InvalidEmailError } from "./errors/InvalidEmailError";
+import { EmailValue } from "./value-objects/EmailValue";
 
 export interface UserRepository {
-  findByEmail(email: string): Promise<ResultValue<UserEntity | null, InvalidEmailError>>;
+  findByEmail(email: EmailValue): Promise<ResultValue<UserEntity | null>>;
   save(user: UserEntity): Promise<void>;
 }

@@ -1,6 +1,6 @@
 services:
   
-# ✅ Shared Services
+# Shared Services
   postgres:
     image: postgres:latest
     container_name: identity-db
@@ -60,7 +60,7 @@ services:
       - /var/lib/docker/:/var/lib/docker:ro
     restart: unless-stopped
 
-# ✅ Microservices (Each One Only Uses Its Needed Dependencies)
+# Microservices (Each One Only Uses Its Needed Dependencies)
   identity-service:
     build:
       context: ../..

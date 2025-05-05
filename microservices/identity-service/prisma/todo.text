@@ -1,0 +1,8 @@
+
+//TODO ALL to check 
+
+- how to change .env from root to infra/docker
+- should I always start by creating table in schema.prisma then convert to TS 
+- how to create jointure in prisma 
+- when I npx prisma migrate dev --name init_user , I should always mention init_user ? if I leave it blank ?  and what is init_user ?
+ 
