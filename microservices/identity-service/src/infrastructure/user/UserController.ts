@@ -9,8 +9,7 @@ import { GetUserUseCase } from '@identity/application/user/GetUserUseCase';
 export class UserController {
 
   constructor(private readonly registerUserUseCase: RegisterUserUseCase,
-    private readonly getUserUseCase: GetUserUseCase
-  ) {}
+    private readonly getUserUseCase: GetUserUseCase) {}
 
   @SwaggerUseCase(RegisterUserUseCase)
   @Post()
@@ -24,8 +23,5 @@ export class UserController {
   async getUser(@Query('email') email: string): Promise<UserResponseDto> {
     const response = await this.getUserUseCase.execute(email);
     return response.unwrap(); 
-  }
-
-  // ADD login with JWT 
-  
+  }  
 }

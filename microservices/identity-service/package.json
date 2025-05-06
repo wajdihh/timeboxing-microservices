@@ -22,12 +22,16 @@
     "showenv": "tools/with-env.sh bash -c 'echo DATABASE_URL=$DATABASE_URL'"
   },
   "dependencies": {
+    "@nestjs/config": "^4.0.2",
     "@prisma/client": "^6.7.0",
     "@timeboxing/shared": "*",
-    "bcrypt": "^5.1.0"
+    "bcrypt": "^5.1.0",
+    "joi": "^17.13.3",
+    "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
+    "@types/jsonwebtoken": "^9.0.9",
     "dotenv-cli": "^8.0.0",
     "prisma": "^6.7.0"
   },

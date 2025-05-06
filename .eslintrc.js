@@ -3,7 +3,7 @@ module.exports = {
     env: {
       node: true
     },
-    ignorePatterns: ['**/dist/**'],
+    ignorePatterns: ['**/dist/**','**/generated/**', '**/config/**'],
     parser: '@typescript-eslint/parser',
     plugins: ['@typescript-eslint', 'filenames', 'boundaries', 'import'],
     extends: [

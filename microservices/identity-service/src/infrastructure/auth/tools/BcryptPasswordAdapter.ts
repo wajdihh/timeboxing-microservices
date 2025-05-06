@@ -1,4 +1,4 @@
-import { PasswordHasherPort } from '@identity/application/security/PasswordHasherPort';
+import { PasswordHasherPort } from '@identity/application/auth/utils/PasswordHasherPort';
 import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 
@@ -12,3 +12,4 @@ export class BcryptPasswordAdapter implements PasswordHasherPort {
         return await bcrypt.compare(plain, hashed);
     }
   }
+  export const PASSWORD_HASHER_PORT = Symbol('BcryptPasswordAdapter');

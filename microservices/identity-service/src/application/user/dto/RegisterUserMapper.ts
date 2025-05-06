@@ -1,6 +1,6 @@
 import { UserEntity } from "@identity/domain/user/UserEntity";
-import { RegisterUserRequestDto } from "../dto/RegisterUserRequestDto";
-import { UserResponseDto } from "../dto/UserResponseDto";
+import { RegisterUserRequestDto } from "./RegisterUserRequestDto";
+import { UserResponseDto } from "./UserResponseDto";
 import { ResultValue } from "@timeboxing/shared";
 import { InvalidEmailError } from "@identity/domain/user/errors/InvalidEmailError";
 
