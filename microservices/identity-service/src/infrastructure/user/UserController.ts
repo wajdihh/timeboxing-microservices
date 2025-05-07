@@ -20,8 +20,8 @@ export class UserController {
 
   @SwaggerUseCase(GetUserUseCase)
   @Get()
-  async getUser(@Query('email') email: string): Promise<UserResponseDto> {
-    const response = await this.getUserUseCase.execute(email);
+  async getUser(@Query('id') id: string): Promise<UserResponseDto> {
+    const response = await this.getUserUseCase.execute(id);
     return response.unwrap(); 
   }  
 }

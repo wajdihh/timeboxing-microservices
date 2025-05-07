@@ -14,7 +14,7 @@ export class LoginRequestDto {
     password!: string;
   
      static sample(): LoginRequestDto {
-      const userFake = UserFactory.withAllFields();
+      const userFake = UserFactory.wajdi();
       return {
         email: userFake.email,
         password: userFake.password,

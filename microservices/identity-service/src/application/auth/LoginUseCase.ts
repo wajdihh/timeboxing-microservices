@@ -8,7 +8,7 @@ import { PasswordHasherPort } from "./utils/PasswordHasherPort";
 import { LoginRequestDto } from "./dto/LoginRequestDto";
 import { LoginResponseDto } from "./dto/LoginResponseDto";
 import { LoginMapper } from "./dto/LoginMapper";
-import { TokenService } from "@identity/domain/auth/TokenService";
+import { AuthRepository } from "@identity/domain/auth/AuthRepository";
 
 @SwaggerUseCaseMetadata({
     errors: [InvalidEmailError, InvalidCredentialsError],
@@ -20,16 +20,16 @@ import { TokenService } from "@identity/domain/auth/TokenService";
 @Injectable()
 export class LoginUseCase {
     constructor(private readonly userRepository: UserRepository,
-        private readonly tokenService: TokenService,
+        private readonly authRepository: AuthRepository,
         private readonly passwordHashPort: PasswordHasherPort) { }
 
-    async execute(dto: LoginRequestDto): Promise<ResultValue<LoginResponseDto, InvalidCredentialsError>> {
+    async execute(dto: LoginRequestDto): Promise<ResultValue<LoginResponseDto, InvalidCredentialsError | InvalidEmailError>> {
 
         const email = dto.email;
         const password = dto.password;
 
         const emailResult = EmailValue.create(email);
-        if (!emailResult.isOk) return ResultValue.error(new InvalidEmailError(email));
+        if (emailResult.isFail) return ResultValue.error(new InvalidEmailError(email));
 
         const emailValue = emailResult.unwrap();
         const userResult = await this.userRepository.findByEmail(emailValue);
@@ -39,12 +39,12 @@ export class LoginUseCase {
         if (!userValue || !passwordResult) return ResultValue.error(new InvalidCredentialsError());
 
         const [accessTokenResult, refreshTokenResult] = await Promise.all([
-            this.tokenService.generateAccessToken(userValue),
-            this.tokenService.generateRefreshToken(userValue)
+            this.authRepository.generateAccessToken(userValue),
+            this.authRepository.generateRefreshToken(userValue)
         ]);
 
-        if (!accessTokenResult.isOk) return ResultValue.error(accessTokenResult.error);
-        if (!refreshTokenResult.isOk) return ResultValue.error(refreshTokenResult.error);
+        if (accessTokenResult.isFail) return ResultValue.error(accessTokenResult.error);
+        if (refreshTokenResult.isFail) return ResultValue.error(refreshTokenResult.error);
 
         const accessTokenValue = accessTokenResult.unwrap();
         const refreshTokenValue = refreshTokenResult.unwrap();

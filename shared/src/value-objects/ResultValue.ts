@@ -1,6 +1,7 @@
 export class ResultValue<T, E extends Error = Error> {
   private constructor(
     public readonly isOk: boolean,
+    public readonly isFail: boolean,
     private readonly _value?: T,
     private readonly _error?: E
   ) {
@@ -8,11 +9,11 @@ export class ResultValue<T, E extends Error = Error> {
   }
 
   static ok<T>(value: T): ResultValue<T> {
-    return new ResultValue<T>(true, value);
+    return new ResultValue<T>(true, false, value);
   }
 
   static error<E extends Error>(error: E): ResultValue<never, E> {
-    return new ResultValue<never, E>(false, undefined, error);
+    return new ResultValue<never, E>(false, true, undefined, error);
   }
 
   static isOk<T, E extends Error>(result: ResultValue<T, E>): result is ResultValue<T, E> {
@@ -20,11 +21,11 @@ export class ResultValue<T, E extends Error = Error> {
   }
 
   static isFail<T, E extends Error>(result: ResultValue<T, E>): result is ResultValue<never, E> {
-    return !result.isOk;
+    return result.isFail;
   }
 
   static returnValue<T, E extends Error>(result: ResultValue<T, E>): T {
-    if (!result.isOk) throw result._error;
+    if (result.isFail) throw result._error;
     return result._value as T;
   }
 
@@ -34,7 +35,7 @@ export class ResultValue<T, E extends Error = Error> {
   }
 
   unwrap(): T {
-    if (!this.isOk) throw this._error;
+    if (this.isFail) throw this._error;
     return this._value as T;
   }
 

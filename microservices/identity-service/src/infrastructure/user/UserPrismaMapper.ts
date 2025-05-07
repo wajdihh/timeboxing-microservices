@@ -15,7 +15,7 @@ export class UserPrismaMapper {
     
       static toPersistence(entity: UserEntity): Prisma.UserCreateInput {
         return {
-          id: entity.id,
+          id: entity.id.value,
           name: entity.name,
           email: entity.email.value,
           passwordHash: entity.passwordHash,

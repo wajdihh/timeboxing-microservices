@@ -25,7 +25,7 @@ export class RegisterUserUseCase {
         const email = dto.email;
         const emailResult = EmailValue.create(email);
 
-        if (!emailResult.isOk) return ResultValue.error(new InvalidEmailError(email));
+        if (emailResult.isFail) return ResultValue.error(new InvalidEmailError(email));
 
         const emailValue = emailResult.unwrap();
         const hashedPassword = await this.passwordHashPort.hash(dto.password);

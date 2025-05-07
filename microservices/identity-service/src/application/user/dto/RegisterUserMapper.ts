@@ -11,7 +11,7 @@ export class RegisterUserMapper {
   
     static toResponse(user: UserEntity):UserResponseDto {
       return {
-        id: user.id,
+        id: user.id.value,
         name: user.name,
         email: user.email.value,
         createdAt: user.createdAt.toISOString(),

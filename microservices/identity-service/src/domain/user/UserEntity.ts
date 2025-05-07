@@ -1,10 +1,10 @@
-import { ResultValue } from "@timeboxing/shared";
+import { ID, ResultValue } from "@timeboxing/shared";
 import { EmailValue } from "./value-objects/EmailValue";
 import { InvalidEmailError } from "./errors/InvalidEmailError";
 
 export class UserEntity {
     private constructor(
-        public readonly id: string,
+        public readonly id: ID,
         public readonly name: string,
         public readonly email: EmailValue,
         public readonly passwordHash: string,
@@ -17,14 +17,14 @@ export class UserEntity {
         if (!emailResult.isOk) {
             ResultValue.error(emailResult.error);
         }
-        const user = new UserEntity(crypto.randomUUID(), name, emailResult.unwrap(), passwordHash, new Date(), new Date());
+        const user = new UserEntity(ID.generate(), name, emailResult.unwrap(), passwordHash, new Date(), new Date());
         return ResultValue.ok(user);
     }
 
     //For restoring from persistence (e.g. Prisma)
     static restore(props: { id: string; name: string; email: string; passwordHash: string; createdAt: Date; updatedAt: Date; }): UserEntity {
         return new UserEntity(
-            props.id,
+            ID.from(props.id),
             props.name,
             EmailValue.create(props.email).unwrap(),
             props.passwordHash,

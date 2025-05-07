@@ -23,7 +23,11 @@ async function bootstrap() {
   //Catch Exceptions from domain layer or application layer
   app.useGlobalFilters(new GlobalExceptionFilter());
   // Enable validation pipe -> This will automatically validate incoming requests based on the DTOs
-  app.useGlobalPipes(new ValidationPipe({ transform: true }));
+  app.useGlobalPipes(new ValidationPipe({
+    transform: true,
+    whitelist: true, // Delete and ignore extra field before reaching code
+    forbidNonWhitelisted: true // Raise exception when there is extra fields vs DTO
+   }));
   await app.listen(port);
 
   console.log(`🚀 Server is running on port ` + port);
