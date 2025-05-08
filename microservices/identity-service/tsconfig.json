@@ -1,17 +1,14 @@
 {
   "extends": "../../tsconfig.base.json",
-  "include": ["src"],
+  "include": ["src", "test"],
   "compilerOptions": {
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "sourceMap": true,
     "baseUrl": ".",
-    "paths": {     
-    "@timeboxing/shared": ["../../shared/*"],
-    "@identity/infrastructure/*": ["src/infrastructure/*"],
-    "@identity/application/*": ["src/application/*"],
-    "@identity/domain/*": ["src/domain/*"],
-    "@identity/modules/*": ["src/modules/*"]
+    "paths": {
+      "@identity/*": ["src/*"],
+      "@timeboxing/shared": ["../../shared/*"]
     }
   }
 }

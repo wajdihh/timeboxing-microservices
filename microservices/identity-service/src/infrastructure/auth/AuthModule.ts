@@ -10,10 +10,10 @@ import { BcryptPasswordAdapter, PASSWORD_HASHER_PORT } from './tools/BcryptPassw
 import { LoginUseCase } from '@identity/application/auth/LoginUseCase';
 import { USER_REPOSITORY, UserRepository } from '@identity/domain/user/UserRepository';
 import { TOKEN_REPOSITORY } from '@identity/domain/auth/TokenRepository';
-import { JwtOptionsFactory } from 'src/config/JwtOptionsFactory';
-import { JwtConfigService } from 'src/config/JwtConfigService';
-import { AppConfigModule } from 'src/config/AppConfigModule';
+import { JwtOptionsFactory } from '@identity/config/JwtOptionsFactory';
+import { AppConfigModule } from '@identity/config/AppConfigModule';
 import { GenerateAuthTokensService } from '@identity/application/user/GenerateAuthTokensService';
+import { JwtConfigService } from '@identity/config/JwtConfigService';
 
 @Module({
   imports: [

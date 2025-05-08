@@ -1,7 +1,6 @@
 import { PassportStrategy } from "@nestjs/passport";
 import { StrategyType } from "./StrategyType";
 import { ExtractJwt } from "passport-jwt";
-import { JwtConfigService } from "src/config/JwtConfigService";
 import { Injectable } from "@nestjs/common";
 import { Strategy as PassportJwtStrategy } from 'passport-jwt';
 import { UserRepository } from "@identity/domain/user/UserRepository";
@@ -9,6 +8,7 @@ import { ID } from "@timeboxing/shared";
 import { UserNotFoundError } from "@identity/domain/user/errors/UserNotFoundError";
 import { InvalidAccessTokenError } from "@identity/domain/auth/erros/InvalidAccessTokenError";
 import { UserEntity } from "@identity/domain/user/UserEntity";
+import { JwtConfigService } from "@identity/config/JwtConfigService";
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(PassportJwtStrategy, StrategyType.JWT) {

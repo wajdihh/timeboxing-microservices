@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { TokenRepository } from '@identity/domain/auth/TokenRepository';
 import { ID, ResultValue } from '@timeboxing/shared';
 import { InvalidRefreshTokenError } from '@identity/domain/auth/erros/InvalidRefreshTokenError';
-import { JwtConfigService } from 'src/config/JwtConfigService';
+import { JwtConfigService } from '@identity/config/JwtConfigService';
 
 @Injectable()
 export class TokenRepositoryAdapter implements TokenRepository {
