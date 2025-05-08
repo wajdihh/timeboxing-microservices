@@ -1,15 +1,15 @@
 import { UserRepository } from "@identity/domain/user/UserRepository";
 import { Injectable } from "@nestjs/common";
 import { AuthTokenType, ResultValue, SuccessStatus, SwaggerUseCaseMetadata } from "@timeboxing/shared";
-import { LoginResponseDto } from "./dto/LoginResponseDto";
-import { LoginMapper } from "./dto/LoginMapper";
+import { AuthResponseDto } from "./dto/AuthResponseDto";
 import { TokenRepository } from "@identity/domain/auth/TokenRepository";
 import { UserNotFoundError } from "@identity/domain/user/errors/UserNotFoundError";
 import { InvalidRefreshTokenError } from "@identity/domain/auth/erros/InvalidRefreshTokenError";
+import { AuthMapper } from "./dto/AuthMapper";
 
 @SwaggerUseCaseMetadata({
     errors: [UserNotFoundError, InvalidRefreshTokenError],
-    response: LoginResponseDto,
+    response: AuthResponseDto,
     successStatus: SuccessStatus.CREATED,
     authTokenType: AuthTokenType.AccessToken
 })
@@ -18,7 +18,7 @@ import { InvalidRefreshTokenError } from "@identity/domain/auth/erros/InvalidRef
 export class RefreshTokenUseCase {
     constructor(private readonly userRepository: UserRepository, private readonly tokenRepository: TokenRepository) { }
 
-    async execute(refreshToken: string): Promise<ResultValue<LoginResponseDto, UserNotFoundError | InvalidRefreshTokenError>> {
+    async execute(refreshToken: string): Promise<ResultValue<AuthResponseDto, UserNotFoundError | InvalidRefreshTokenError>> {
 
         const idResult = await this.tokenRepository.verifyRefreshToken(refreshToken);
         if (idResult.isFail) return ResultValue.error(new InvalidRefreshTokenError())
@@ -44,7 +44,7 @@ export class RefreshTokenUseCase {
 
         const accessTokenValue = accessTokenResult.unwrap();
         const refreshTokenValue = refreshTokenResult.unwrap();
-        const response = LoginMapper.toResponse(accessTokenValue, refreshTokenValue);
+        const response = AuthMapper.toResponse(accessTokenValue, refreshTokenValue);
 
         return ResultValue.ok(response);
     }

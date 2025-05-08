@@ -3,16 +3,17 @@ import { Injectable } from "@nestjs/common";
 import { RegisterUserRequestDto } from "./dto/RegisterUserRequestDto";
 import { RegisterUserMapper } from "./dto/RegisterUserMapper";
 import { PasswordHasherPort } from "../auth/utils/PasswordHasherPort";
-import { UserResponseDto } from "./dto/UserResponseDto";
 import { UserAlreadyExistsError } from "@identity/domain/user/errors/UserAlreadyExistsError";
 import { SuccessStatus, ResultValue, SwaggerUseCaseMetadata } from "@timeboxing/shared";
 import { InvalidEmailError } from "@identity/domain/user/errors/InvalidEmailError";
 import { EmailValue } from "@identity/domain/user/value-objects/EmailValue";
+import { AuthResponseDto } from "../auth/dto/AuthResponseDto";
+import { UserEntity } from "@identity/domain/user/UserEntity";
 
 @SwaggerUseCaseMetadata({
     errors: [InvalidEmailError, UserAlreadyExistsError],
     request: RegisterUserRequestDto,
-    response: UserResponseDto,
+    response: AuthResponseDto,
     successStatus: SuccessStatus.CREATED,
 })
 @Injectable()
@@ -20,7 +21,7 @@ export class RegisterUserUseCase {
 
     constructor(private readonly userRepository: UserRepository, private readonly passwordHashPort: PasswordHasherPort) { }
 
-    async execute(dto: RegisterUserRequestDto): Promise<ResultValue<UserResponseDto, UserAlreadyExistsError | InvalidEmailError>> {
+    async execute(dto: RegisterUserRequestDto): Promise<ResultValue<UserEntity, UserAlreadyExistsError | InvalidEmailError>> {
 
         const email = dto.email;
         const emailResult = EmailValue.create(email);
@@ -36,8 +37,7 @@ export class RegisterUserUseCase {
 
         const user = RegisterUserMapper.toDomain(dto, hashedPassword).unwrap();
         await this.userRepository.save(user);
-        const response = RegisterUserMapper.toResponse(user);
-        return ResultValue.ok(response);
+        return ResultValue.ok(user);
 
     }
 }

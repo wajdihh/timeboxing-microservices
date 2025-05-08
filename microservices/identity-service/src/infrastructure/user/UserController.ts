@@ -4,18 +4,22 @@ import { RegisterUserUseCase } from '@identity/application/user/RegisterUserUseC
 import { SwaggerUseCase } from '@timeboxing/shared';
 import { UserResponseDto } from '@identity/application/user/dto/UserResponseDto';
 import { GetUserUseCase } from '@identity/application/user/GetUserUseCase';
+import { GenerateAuthTokensService } from '@identity/application/user/GenerateAuthTokensService';
+import { AuthResponseDto } from '@identity/application/auth/dto/AuthResponseDto';
 
 @Controller('user')
 export class UserController {
 
   constructor(private readonly registerUserUseCase: RegisterUserUseCase,
+    private readonly generateTokensForUserService: GenerateAuthTokensService,
     private readonly getUserUseCase: GetUserUseCase) {}
 
   @SwaggerUseCase(RegisterUserUseCase)
   @Post()
-  async register(@Body() dto: RegisterUserRequestDto): Promise<UserResponseDto> {
-    const response = await this.registerUserUseCase.execute(dto);
-    return response.unwrap(); 
+  async register(@Body() dto: RegisterUserRequestDto): Promise<AuthResponseDto> {
+    const userResult = await this.registerUserUseCase.execute(dto);
+    const user = userResult.unwrap();
+    return this.generateTokensForUserService.execute(user);
   }
 
   @SwaggerUseCase(GetUserUseCase)

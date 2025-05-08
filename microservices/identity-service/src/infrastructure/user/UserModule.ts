@@ -6,9 +6,10 @@ import { GetUserUseCase } from '@identity/application/user/GetUserUseCase';
 import { PrismaUserRepository } from './PrismaUserRepository';
 import { PrismaModule } from '../prisma/PrismaModule';
 import { USER_REPOSITORY } from '@identity/domain/user/UserRepository';
+import { AuthModule } from '../auth/AuthModule';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, AuthModule],
   controllers: [UserController],
   providers: [
     { provide: USER_REPOSITORY, useClass: PrismaUserRepository },

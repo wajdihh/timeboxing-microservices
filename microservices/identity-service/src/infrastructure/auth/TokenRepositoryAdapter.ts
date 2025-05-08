@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { TokenRepository } from '@identity/domain/auth/TokenRepository';
 import { ID, ResultValue } from '@timeboxing/shared';

@@ -126,7 +126,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "/Users/c_wbenha/MyData/MyHh/timeboxing-microservices/microservices/identity-service/generated/prisma",
+      "value": "/Users/wajdihh/MyData/Projects/timeboxing-microservices/microservices/identity-service/generated/prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -140,7 +140,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "/Users/c_wbenha/MyData/MyHh/timeboxing-microservices/microservices/identity-service/prisma/schema.prisma",
+    "sourceFilePath": "/Users/wajdihh/MyData/Projects/timeboxing-microservices/microservices/identity-service/prisma/schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {

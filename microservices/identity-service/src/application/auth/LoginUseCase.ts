@@ -6,13 +6,13 @@ import { ResultValue, SuccessStatus, SwaggerUseCaseMetadata } from "@timeboxing/
 import { EmailValue } from "@identity/domain/user/value-objects/EmailValue";
 import { PasswordHasherPort } from "./utils/PasswordHasherPort";
 import { LoginRequestDto } from "./dto/LoginRequestDto";
-import { LoginResponseDto } from "./dto/LoginResponseDto";
+import { AuthResponseDto } from "./dto/AuthResponseDto";
 import { UserEntity } from "@identity/domain/user/UserEntity";
 
 @SwaggerUseCaseMetadata({
     errors: [InvalidEmailError, InvalidCredentialsError],
     request: LoginRequestDto,
-    response: LoginResponseDto,
+    response: AuthResponseDto,
     successStatus: SuccessStatus.CREATED,
 })
 

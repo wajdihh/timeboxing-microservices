@@ -12,6 +12,7 @@ import { TOKEN_REPOSITORY } from '@identity/domain/auth/TokenRepository';
 import { JwtOptionsFactory } from 'src/config/JwtOptionsFactory';
 import { JwtConfigService } from 'src/config/JwtConfigService';
 import { AppConfigModule } from 'src/config/AppConfigModule';
+import { GenerateAuthTokensService } from '@identity/application/user/GenerateAuthTokensService';
 
 @Module({
   imports: [
@@ -31,11 +32,21 @@ import { AppConfigModule } from 'src/config/AppConfigModule';
     { provide: USER_REPOSITORY, useClass: PrismaUserRepository },
     { provide: PASSWORD_HASHER_PORT, useClass: BcryptPasswordAdapter },
     {
+      provide: GenerateAuthTokensService,
+      useFactory: (tokenRepository) => 
+        new GenerateAuthTokensService(tokenRepository),
+      inject: [TOKEN_REPOSITORY],
+    },
+    {
       provide: LoginUseCase,
       useFactory: (userRepository, passwordHasher) =>
         new LoginUseCase(userRepository, passwordHasher),
       inject: [USER_REPOSITORY, PASSWORD_HASHER_PORT],
     },
   ],
+  exports: [
+    TOKEN_REPOSITORY,          
+    GenerateAuthTokensService,
+  ]
 })
 export class AuthModule {}
