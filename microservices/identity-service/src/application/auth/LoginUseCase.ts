@@ -2,28 +2,34 @@ import { InvalidCredentialsError } from "@identity/domain/auth/erros/InvalidCred
 import { InvalidEmailError } from "@identity/domain/user/errors/InvalidEmailError";
 import { UserRepository } from "@identity/domain/user/UserRepository";
 import { Injectable } from "@nestjs/common";
-import { DomainHttpCode, ResultValue, SwaggerUseCaseMetadata } from "@timeboxing/shared";
+import { ResultValue, SuccessStatus, SwaggerUseCaseMetadata } from "@timeboxing/shared";
 import { EmailValue } from "@identity/domain/user/value-objects/EmailValue";
 import { PasswordHasherPort } from "./utils/PasswordHasherPort";
 import { LoginRequestDto } from "./dto/LoginRequestDto";
 import { LoginResponseDto } from "./dto/LoginResponseDto";
-import { LoginMapper } from "./dto/LoginMapper";
-import { AuthRepository } from "@identity/domain/auth/AuthRepository";
+import { UserEntity } from "@identity/domain/user/UserEntity";
 
 @SwaggerUseCaseMetadata({
     errors: [InvalidEmailError, InvalidCredentialsError],
     request: LoginRequestDto,
     response: LoginResponseDto,
-    successStatus: DomainHttpCode.CREATED,
+    successStatus: SuccessStatus.CREATED,
 })
+
+/**
+ * We GOT AN EXCEPTION FOR OUR DDD here 
+ * Passport uses Stratgy to call useCase , and useCase should return entity and not EntityResponseDTO 
+ * Then this stratgy is used directly by controller 
+ * SO ONLY FOR passport 
+ * Controller -> Stratgy -> UseCase
+ */
 
 @Injectable()
 export class LoginUseCase {
     constructor(private readonly userRepository: UserRepository,
-        private readonly authRepository: AuthRepository,
         private readonly passwordHashPort: PasswordHasherPort) { }
 
-    async execute(dto: LoginRequestDto): Promise<ResultValue<LoginResponseDto, InvalidCredentialsError | InvalidEmailError>> {
+    async execute(dto: LoginRequestDto): Promise<ResultValue<UserEntity, InvalidCredentialsError | InvalidEmailError>> {
 
         const email = dto.email;
         const password = dto.password;
@@ -33,23 +39,12 @@ export class LoginUseCase {
 
         const emailValue = emailResult.unwrap();
         const userResult = await this.userRepository.findByEmail(emailValue);
+        if (userResult.isFail) return ResultValue.error(new InvalidCredentialsError());
         const userValue = userResult.unwrap();
 
-        const passwordResult = await this.passwordHashPort.compare(password, userValue?.passwordHash || '');
-        if (!userValue || !passwordResult) return ResultValue.error(new InvalidCredentialsError());
+        const isPasswordValid = await this.passwordHashPort.compare(password, userValue?.passwordHash || '');
+        if (!userValue || !isPasswordValid) return ResultValue.error(new InvalidCredentialsError());
 
-        const [accessTokenResult, refreshTokenResult] = await Promise.all([
-            this.authRepository.generateAccessToken(userValue),
-            this.authRepository.generateRefreshToken(userValue)
-        ]);
-
-        if (accessTokenResult.isFail) return ResultValue.error(accessTokenResult.error);
-        if (refreshTokenResult.isFail) return ResultValue.error(refreshTokenResult.error);
-
-        const accessTokenValue = accessTokenResult.unwrap();
-        const refreshTokenValue = refreshTokenResult.unwrap();
-        const response = LoginMapper.toResponse(accessTokenValue, refreshTokenValue);
-
-        return ResultValue.ok(response);
+        return ResultValue.ok(userValue);
     }
 }

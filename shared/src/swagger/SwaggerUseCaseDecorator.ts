@@ -1,8 +1,8 @@
 // shared/decorators/ApiErrorsFromUseCase.ts
 import { applyDecorators, Type } from '@nestjs/common';
-import { ApiBody, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiResponse } from '@nestjs/swagger';
 import { BaseDomainError } from '../errors/BaseDomainError';
-import { DomainHttpCode } from '../errors';
+import { AuthTokenType, DomainHttpCode } from '../errors';
 
 /**
  * 
@@ -17,8 +17,18 @@ export function SwaggerUseCase(useCaseClass: Type<unknown>) {
   const response = Reflect.getMetadata('usecase:response', useCaseClass);
   const successStatus = Reflect.getMetadata('usecase:successStatus', useCaseClass) ?? 201;
   const errors: Array<typeof BaseDomainError> = Reflect.getMetadata('usecase:errors', useCaseClass) ?? [];
+  const authTokenType = Reflect.getMetadata('usecase:authTokenType', useCaseClass);
 
   const decorators = [];
+
+  // Add auth tokens
+  if (authTokenType === AuthTokenType.AccessToken) {
+    decorators.push(ApiBearerAuth('access-token'));
+    console.log('########## token acess')
+  } else if (authTokenType === AuthTokenType.RefreshToken) {
+    decorators.push(ApiBearerAuth('refresh-token'));
+    console.log('########## token refrsh')
+  }
 
   // Request body with example
   if (request?.sample) {
@@ -61,35 +71,35 @@ export function SwaggerUseCase(useCaseClass: Type<unknown>) {
     const message = (ErrorClass as typeof BaseDomainError).swaggerMessage ?? ErrorClass.name;
     const name = ErrorClass.name;
 
-  decorators.push(
-    ApiResponse({
-      status: statusCode,
-      description: message,
-      schema: {
-        example: {
-          statusCode,
-          message,
-          error: name,
+    decorators.push(
+      ApiResponse({
+        status: statusCode,
+        description: message,
+        schema: {
+          example: {
+            statusCode,
+            message,
+            error: name,
+          },
         },
-      },
-    })
-  );
+      })
+    );
 
-  //Handled by the global exception filter based on DTO validation
-  decorators.push(
-    ApiResponse({
-      status: 400,
-      description: 'Invalid DTO validation Pipe',
-      schema: {
-        example: {
-          statusCode: 400,
-          message: ['examples: email must be a valid email', 'password must be at least 8 characters'],
-          error: 'Bad Request',
+    //Handled by the global exception filter based on DTO validation
+    decorators.push(
+      ApiResponse({
+        status: 400,
+        description: 'Invalid DTO validation Pipe',
+        schema: {
+          example: {
+            statusCode: 400,
+            message: ['examples: email must be a valid email', 'password must be at least 8 characters'],
+            error: 'Bad Request',
+          },
         },
-      },
-    })
-  );
-}
+      })
+    );
+  }
 
   return applyDecorators(...decorators);
 }

@@ -16,6 +16,8 @@ export function setupSwagger(app: INestApplication, options?: SwaggerOptions): v
     .setTitle(options?.title ?? 'TimeBoxing API')
     .setDescription(options?.description ?? 'API documentation')
     .setVersion(options?.version ?? '1.0')
+    .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT' }, 'access-token')
+    .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT' }, 'refresh-token')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

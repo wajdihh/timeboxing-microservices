@@ -5,7 +5,7 @@ import { RegisterUserMapper } from "./dto/RegisterUserMapper";
 import { PasswordHasherPort } from "../auth/utils/PasswordHasherPort";
 import { UserResponseDto } from "./dto/UserResponseDto";
 import { UserAlreadyExistsError } from "@identity/domain/user/errors/UserAlreadyExistsError";
-import { DomainHttpCode, ResultValue, SwaggerUseCaseMetadata } from "@timeboxing/shared";
+import { SuccessStatus, ResultValue, SwaggerUseCaseMetadata } from "@timeboxing/shared";
 import { InvalidEmailError } from "@identity/domain/user/errors/InvalidEmailError";
 import { EmailValue } from "@identity/domain/user/value-objects/EmailValue";
 
@@ -13,7 +13,7 @@ import { EmailValue } from "@identity/domain/user/value-objects/EmailValue";
     errors: [InvalidEmailError, UserAlreadyExistsError],
     request: RegisterUserRequestDto,
     response: UserResponseDto,
-    successStatus: DomainHttpCode.CREATED,
+    successStatus: SuccessStatus.CREATED,
 })
 @Injectable()
 export class RegisterUserUseCase {

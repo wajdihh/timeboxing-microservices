@@ -1,35 +1,41 @@
 import { Module } from '@nestjs/common';
-import { BcryptPasswordAdapter, PASSWORD_HASHER_PORT } from './tools/BcryptPasswordAdapter';
-import { AuthRepositoryAdapter } from './AuthRepositoryAdapter';
-import { AuthController } from './AuthController';
-import { LoginUseCase } from '@identity/application/auth/LoginUseCase';
-import { PrismaUserRepository } from '../user/PrismaUserRepository';
-import { AUTH_REPOSITORY } from '@identity/domain/auth/AuthRepository';
-import { USER_REPOSITORY } from '@identity/domain/user/UserRepository';
+import { JwtModule } from '@nestjs/jwt';
 import { PrismaModule } from '../prisma/PrismaModule';
-import { RefreshTokenUseCase } from '@identity/application/auth/RefreshTokenUseCase';
+import { PrismaUserRepository } from '../user/PrismaUserRepository';
+import { AuthController } from './AuthController';
+import { LocalStrategy } from './strategies/LocalStrategy';
+import { TokenRepositoryAdapter } from './TokenRepositoryAdapter';
+import { BcryptPasswordAdapter, PASSWORD_HASHER_PORT } from './tools/BcryptPasswordAdapter';
+import { LoginUseCase } from '@identity/application/auth/LoginUseCase';
+import { USER_REPOSITORY } from '@identity/domain/user/UserRepository';
+import { TOKEN_REPOSITORY } from '@identity/domain/auth/TokenRepository';
+import { JwtOptionsFactory } from 'src/config/JwtOptionsFactory';
+import { JwtConfigService } from 'src/config/JwtConfigService';
+import { AppConfigModule } from 'src/config/AppConfigModule';
 
 @Module({
   imports: [
-    PrismaModule
+    PrismaModule,
+    AppConfigModule,
+    JwtModule.registerAsync({
+      imports: [AppConfigModule],
+      inject: [JwtConfigService], 
+      useFactory: JwtOptionsFactory,
+    }),
   ],
   controllers: [AuthController],
   providers: [
-    { provide: AUTH_REPOSITORY, useClass: AuthRepositoryAdapter },
+    LocalStrategy,
+    TokenRepositoryAdapter,
+    { provide: TOKEN_REPOSITORY, useExisting: TokenRepositoryAdapter },
     { provide: USER_REPOSITORY, useClass: PrismaUserRepository },
     { provide: PASSWORD_HASHER_PORT, useClass: BcryptPasswordAdapter },
     {
       provide: LoginUseCase,
-      useFactory: (userRepository, authRepository, passwordHasher) =>
-        new LoginUseCase(userRepository, authRepository, passwordHasher),
-      inject: [USER_REPOSITORY, AUTH_REPOSITORY, PASSWORD_HASHER_PORT],
+      useFactory: (userRepository, passwordHasher) =>
+        new LoginUseCase(userRepository, passwordHasher),
+      inject: [USER_REPOSITORY, PASSWORD_HASHER_PORT],
     },
-    {
-      provide: RefreshTokenUseCase,
-      useFactory: (userRepository, authRepository) =>
-        new RefreshTokenUseCase(userRepository, authRepository),
-      inject: [USER_REPOSITORY, AUTH_REPOSITORY],
-    }
   ],
 })
-export class AuthModule { }
+export class AuthModule {}

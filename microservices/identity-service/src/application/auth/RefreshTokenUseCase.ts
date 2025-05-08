@@ -1,29 +1,26 @@
 import { UserRepository } from "@identity/domain/user/UserRepository";
 import { Injectable } from "@nestjs/common";
-import { DomainHttpCode, ResultValue, SwaggerUseCaseMetadata } from "@timeboxing/shared";
+import { AuthTokenType, ResultValue, SuccessStatus, SwaggerUseCaseMetadata } from "@timeboxing/shared";
 import { LoginResponseDto } from "./dto/LoginResponseDto";
 import { LoginMapper } from "./dto/LoginMapper";
-import { AuthRepository } from "@identity/domain/auth/AuthRepository";
-import { RefreshTokenRequestDto } from "./dto/RefreshTokenRequestDto";
+import { TokenRepository } from "@identity/domain/auth/TokenRepository";
 import { UserNotFoundError } from "@identity/domain/user/errors/UserNotFoundError";
 import { InvalidRefreshTokenError } from "@identity/domain/auth/erros/InvalidRefreshTokenError";
 
 @SwaggerUseCaseMetadata({
     errors: [UserNotFoundError, InvalidRefreshTokenError],
-    request: RefreshTokenRequestDto,
     response: LoginResponseDto,
-    successStatus: DomainHttpCode.CREATED,
+    successStatus: SuccessStatus.CREATED,
+    authTokenType: AuthTokenType.AccessToken
 })
 
 @Injectable()
 export class RefreshTokenUseCase {
-    constructor(private readonly userRepository: UserRepository, private readonly authRepository: AuthRepository) { }
+    constructor(private readonly userRepository: UserRepository, private readonly tokenRepository: TokenRepository) { }
 
-    async execute(dto: RefreshTokenRequestDto): Promise<ResultValue<LoginResponseDto, UserNotFoundError | InvalidRefreshTokenError>> {
+    async execute(refreshToken: string): Promise<ResultValue<LoginResponseDto, UserNotFoundError | InvalidRefreshTokenError>> {
 
-        const token = dto.refreshToken;
-
-        const idResult = await this.authRepository.verifyRefreshToken(token);
+        const idResult = await this.tokenRepository.verifyRefreshToken(refreshToken);
         if (idResult.isFail) return ResultValue.error(new InvalidRefreshTokenError())
 
         const id = idResult.unwrap();        
@@ -38,8 +35,8 @@ export class RefreshTokenUseCase {
         }
 
         const [accessTokenResult, refreshTokenResult] = await Promise.all([
-            this.authRepository.generateAccessToken(userValue),
-            this.authRepository.generateRefreshToken(userValue)
+            this.tokenRepository.generateAccessToken('userValue', ''),
+            this.tokenRepository.generateRefreshToken('userValue')
         ]);
 
         if (accessTokenResult.isFail) return ResultValue.error(accessTokenResult.error);

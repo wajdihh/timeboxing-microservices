@@ -31,7 +31,7 @@ module.exports = {
       //Enforce PascalCase file names with common suffixes
       'filenames/match-regex': [
         'error',
-        `^[A-Z][A-Za-z0-9]+(Service|Controller|UseCase|Repository|Entity|Dto|Filter|Module|Adapter|Port|Interceptor|Mapper|Middleware|Util|Value|Decorator|Exception|Error|Factory)$`,
+        `^[A-Z][A-Za-z0-9]+(Service|Controller|UseCase|Repository|Entity|Dto|Filter|Module|Adapter|Port|Interceptor|Mapper|Middleware|Util|Value|Type|Decorator|Exception|Error|Factory|Strategy)$`,
         true
       ],
      'filenames/match-exported': [2, 'pascal-case'],

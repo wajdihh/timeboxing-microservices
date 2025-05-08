@@ -23,15 +23,21 @@
   },
   "dependencies": {
     "@nestjs/config": "^4.0.2",
+    "@nestjs/jwt": "^11.0.0",
+    "@nestjs/passport": "^11.0.5",
     "@prisma/client": "^6.7.0",
     "@timeboxing/shared": "*",
     "bcrypt": "^5.1.0",
     "joi": "^17.13.3",
-    "jsonwebtoken": "^9.0.2"
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1",
+    "passport-local": "^1.0.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
     "@types/jsonwebtoken": "^9.0.9",
+    "@types/passport-jwt": "^4.0.1",
+    "@types/passport-local": "^1.0.38",
     "dotenv-cli": "^8.0.0",
     "prisma": "^6.7.0"
   },
