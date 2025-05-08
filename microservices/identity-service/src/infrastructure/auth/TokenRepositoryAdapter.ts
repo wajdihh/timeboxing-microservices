@@ -40,7 +40,12 @@ export class TokenRepositoryAdapter implements TokenRepository {
       if (!payload?.sub) {
         return ResultValue.error(new InvalidRefreshTokenError());
       }
-      return ResultValue.ok(ID.from(payload.sub));
+
+      const idResult = ID.from(payload.sub);
+      if (idResult.isFail) return ResultValue.error(idResult.error);
+      const idValue = idResult.unwrap();
+
+      return ResultValue.ok(idValue);
     } catch {
       return ResultValue.error(new InvalidRefreshTokenError());
     }

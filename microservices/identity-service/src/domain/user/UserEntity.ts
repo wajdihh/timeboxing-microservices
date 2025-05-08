@@ -22,14 +22,21 @@ export class UserEntity {
     }
 
     //For restoring from persistence (e.g. Prisma)
-    static restore(props: { id: string; name: string; email: string; passwordHash: string; createdAt: Date; updatedAt: Date; }): UserEntity {
-        return new UserEntity(
-            ID.from(props.id),
+    static restore(props: { id: string; name: string; email: string; passwordHash: string; createdAt: Date; updatedAt: Date; }):  ResultValue<UserEntity, TypeError> {
+
+        const idResult = ID.from(props.id);
+        if (idResult.isFail) return ResultValue.error(idResult.error);
+        const idValue = idResult.unwrap();
+
+        const user = new UserEntity(
+            idValue,
             props.name,
             EmailValue.create(props.email).unwrap(),
             props.passwordHash,
             props.createdAt,
             props.updatedAt
         );
+
+        return ResultValue.ok(user);
     }
 }

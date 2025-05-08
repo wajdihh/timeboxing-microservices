@@ -10,7 +10,7 @@ export class UserPrismaMapper {
           passwordHash: user.passwordHash,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt
-        });
+        }).unwrap();
       }
     
       static toPersistence(entity: UserEntity): Prisma.UserCreateInput {

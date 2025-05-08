@@ -16,7 +16,11 @@ export class GetUserUseCase {
     constructor(private readonly userRepository: UserRepository) { }
 
     async execute(id: string): Promise<ResultValue<UserResponseDto, UserNotFoundError>> {
-        const userResult = await this.userRepository.findByID(ID.from(id));
+        const idResult = ID.from(id);
+        if (idResult.isFail) return ResultValue.error(idResult.error);
+        const idValue = idResult.unwrap();
+
+        const userResult = await this.userRepository.findByID(idValue);
         const userValue = userResult.unwrap();
 
         if (!userValue) return ResultValue.error(new UserNotFoundError(id));

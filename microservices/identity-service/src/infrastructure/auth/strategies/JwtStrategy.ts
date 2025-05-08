@@ -21,12 +21,14 @@ export class JwtStrategy extends PassportStrategy(PassportJwtStrategy, StrategyT
   }
 
   async validate(payload: { sub: string }) {
-    console.log('####### payload', payload);
-    const id = payload.sub;
-    const userResult = await this.userRepository.findByID(ID.from(id));
+    const idResult = ID.from(payload.sub);
+    if (idResult.isFail) return ResultValue.error(idResult.error);
+    const idValue = idResult.unwrap();
+
+    const userResult = await this.userRepository.findByID(idValue);
     if (userResult.isFail) return ResultValue.error(new InvalidAccessTokenError());
     const userValue = userResult.unwrap();
-    if (!userValue) return ResultValue.error(new UserNotFoundError(id));
+    if (!userValue) return ResultValue.error(new UserNotFoundError(idValue.value));
     return userValue;
   }
 }
