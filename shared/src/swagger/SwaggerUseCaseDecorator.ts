@@ -12,17 +12,13 @@ import { AuthTokenType, DomainHttpCode } from '../errors';
  * @param errors - An array of error classes that the use case can throw. Exp : [InvalidEmailError, UserAlreadyExistsError] -> Domain Erros
  * @returns 
  */
-export function SwaggerUseCase(useCaseClass: Type<unknown>, errorsExtraInfo?: Array<typeof BaseDomainError>) {
+export function SwaggerUseCase(useCaseClass: Type<unknown>) {
   const request = Reflect.getMetadata('usecase:request', useCaseClass);
   const response = Reflect.getMetadata('usecase:response', useCaseClass);
   const successStatus = Reflect.getMetadata('usecase:successStatus', useCaseClass) ?? 201;
-  const baseErrors: Array<typeof BaseDomainError> = Reflect.getMetadata('usecase:errors', useCaseClass) ?? [];
+  const errors: Array<typeof BaseDomainError> = Reflect.getMetadata('usecase:errors', useCaseClass) ?? [];
   const authTokenType = Reflect.getMetadata('usecase:authTokenType', useCaseClass);
 
-  const errors: Array<typeof BaseDomainError> = [
-    ...baseErrors,
-    ...(errorsExtraInfo ?? []), 
-  ];
   const decorators = [];
 
   // Add auth tokens
@@ -60,7 +56,7 @@ export function SwaggerUseCase(useCaseClass: Type<unknown>, errorsExtraInfo?: Ar
   } else if (response?.sample) {
     decorators.push(
       ApiResponse({
-        status: successStatus ?? DomainHttpCode.OK,
+        status: DomainHttpCode.OK,
         description: 'Success',
         schema: {
           example: response.sample(),

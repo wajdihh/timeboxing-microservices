@@ -21,5 +21,8 @@ export function setupSwagger(app: INestApplication, options?: SwaggerOptions): v
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup(options?.path ?? 'docs', app, document);
+  SwaggerModule.setup(options?.path ?? 'docs', app, document, {
+    swaggerOptions: {
+      persistAuthorization: true, //to save token in my browser storage
+    }});
 }

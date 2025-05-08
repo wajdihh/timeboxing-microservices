@@ -52,6 +52,7 @@ import { GenerateAuthTokensService } from '@identity/application/user/GenerateAu
     },
   ],
   exports: [
+    JwtStrategy,
     TOKEN_REPOSITORY,          
     GenerateAuthTokensService,
   ]

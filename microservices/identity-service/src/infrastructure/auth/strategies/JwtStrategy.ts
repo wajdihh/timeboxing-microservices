@@ -5,9 +5,10 @@ import { JwtConfigService } from "src/config/JwtConfigService";
 import { Injectable } from "@nestjs/common";
 import { Strategy as PassportJwtStrategy } from 'passport-jwt';
 import { UserRepository } from "@identity/domain/user/UserRepository";
-import { ID, ResultValue } from "@timeboxing/shared";
+import { ID } from "@timeboxing/shared";
 import { UserNotFoundError } from "@identity/domain/user/errors/UserNotFoundError";
 import { InvalidAccessTokenError } from "@identity/domain/auth/erros/InvalidAccessTokenError";
+import { UserEntity } from "@identity/domain/user/UserEntity";
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(PassportJwtStrategy, StrategyType.JWT) {
@@ -17,18 +18,25 @@ export class JwtStrategy extends PassportStrategy(PassportJwtStrategy, StrategyT
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       secretOrKey: jwtConfig.getAccessSecret(),
+      algorithms: ['HS256'],
     });
   }
 
-  async validate(payload: { sub: string }) {
+  async validate(payload: { sub: string }): Promise<UserEntity> {
     const idResult = ID.from(payload.sub);
-    if (idResult.isFail) return ResultValue.error(idResult.error);
-    const idValue = idResult.unwrap();
+    if (idResult.isFail) {
+      throw new InvalidAccessTokenError();
+    }
 
-    const userResult = await this.userRepository.findByID(idValue);
-    if (userResult.isFail) return ResultValue.error(new InvalidAccessTokenError());
-    const userValue = userResult.unwrap();
-    if (!userValue) return ResultValue.error(new UserNotFoundError(idValue.value));
-    return userValue;
+    const userResult = await this.userRepository.findByID(idResult.unwrap());
+    if (userResult.isFail) {
+      throw new InvalidAccessTokenError();
+    }
+
+    const user = userResult.unwrap();
+    if (!user) {
+      throw new UserNotFoundError(payload.sub);
+    }
+    return user;
   }
 }
