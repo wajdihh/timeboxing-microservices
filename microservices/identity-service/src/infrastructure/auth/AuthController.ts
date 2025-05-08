@@ -4,7 +4,7 @@ import { LoginUseCase } from '@identity/application/auth/LoginUseCase';
 import { AuthResponseDto } from '@identity/application/auth/dto/AuthResponseDto';
 import { AuthGuard } from '@nestjs/passport';
 import { StrategyType } from './strategies/StrategyType';
-import { RequestWithUser } from './tools/RequestWithUserValue';
+import { RequestWithUser } from './strategies/RequestWithUserValue';
 import { GenerateAuthTokensService } from '@identity/application/user/GenerateAuthTokensService';
 
 @Controller('auth')

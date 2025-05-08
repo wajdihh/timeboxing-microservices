@@ -3,7 +3,7 @@ import { Injectable } from "@nestjs/common";
 import { UserResponseDto } from "./dto/UserResponseDto";
 import { UserNotFoundError } from "@identity/domain/user/errors/UserNotFoundError";
 import { SuccessStatus, ID, ResultValue, SwaggerUseCaseMetadata } from "@timeboxing/shared";
-import { RegisterUserMapper } from "./dto/RegisterUserMapper";
+import { UserMapper } from "./dto/UserMapper";
 
 @SwaggerUseCaseMetadata({
     errors: [UserNotFoundError],
@@ -21,7 +21,7 @@ export class GetUserUseCase {
 
         if (!userValue) return ResultValue.error(new UserNotFoundError(id));
 
-        const response = RegisterUserMapper.toResponse(userValue);
+        const response = UserMapper.toResponse(userValue);
         return ResultValue.ok(response);
 
     }

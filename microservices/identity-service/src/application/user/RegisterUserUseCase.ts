@@ -1,7 +1,7 @@
 import { UserRepository } from "@identity/domain/user/UserRepository";
 import { Injectable } from "@nestjs/common";
 import { RegisterUserRequestDto } from "./dto/RegisterUserRequestDto";
-import { RegisterUserMapper } from "./dto/RegisterUserMapper";
+import { UserMapper } from "./dto/UserMapper";
 import { PasswordHasherPort } from "../auth/utils/PasswordHasherPort";
 import { UserAlreadyExistsError } from "@identity/domain/user/errors/UserAlreadyExistsError";
 import { SuccessStatus, ResultValue, SwaggerUseCaseMetadata } from "@timeboxing/shared";
@@ -35,7 +35,7 @@ export class RegisterUserUseCase {
         if (!existingUser.isOk) return ResultValue.error(existingUser.error);
         if (existingUser.isOk && existingUser.unwrap()) return ResultValue.error(new UserAlreadyExistsError(dto.email));
 
-        const user = RegisterUserMapper.toDomain(dto, hashedPassword).unwrap();
+        const user = UserMapper.toDomain(dto, hashedPassword).unwrap();
         await this.userRepository.save(user);
         return ResultValue.ok(user);
 

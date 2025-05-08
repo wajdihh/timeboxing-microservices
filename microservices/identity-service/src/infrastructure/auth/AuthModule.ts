@@ -4,10 +4,11 @@ import { PrismaModule } from '../prisma/PrismaModule';
 import { PrismaUserRepository } from '../user/PrismaUserRepository';
 import { AuthController } from './AuthController';
 import { LocalStrategy } from './strategies/LocalStrategy';
+import { JwtStrategy } from './strategies/JwtStrategy';
 import { TokenRepositoryAdapter } from './TokenRepositoryAdapter';
 import { BcryptPasswordAdapter, PASSWORD_HASHER_PORT } from './tools/BcryptPasswordAdapter';
 import { LoginUseCase } from '@identity/application/auth/LoginUseCase';
-import { USER_REPOSITORY } from '@identity/domain/user/UserRepository';
+import { USER_REPOSITORY, UserRepository } from '@identity/domain/user/UserRepository';
 import { TOKEN_REPOSITORY } from '@identity/domain/auth/TokenRepository';
 import { JwtOptionsFactory } from 'src/config/JwtOptionsFactory';
 import { JwtConfigService } from 'src/config/JwtConfigService';
@@ -31,6 +32,12 @@ import { GenerateAuthTokensService } from '@identity/application/user/GenerateAu
     { provide: TOKEN_REPOSITORY, useExisting: TokenRepositoryAdapter },
     { provide: USER_REPOSITORY, useClass: PrismaUserRepository },
     { provide: PASSWORD_HASHER_PORT, useClass: BcryptPasswordAdapter },
+    {
+      provide: JwtStrategy,
+      useFactory: (jwtConfig: JwtConfigService, userRepository: UserRepository) =>
+        new JwtStrategy(jwtConfig, userRepository),
+      inject: [JwtConfigService, USER_REPOSITORY],
+    },
     {
       provide: GenerateAuthTokensService,
       useFactory: (tokenRepository) => 

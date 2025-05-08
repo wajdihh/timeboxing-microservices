@@ -1,4 +1,3 @@
-// domain/auth/errors/MissingRefreshTokenError.ts
 import { BaseDomainError, DomainHttpCode } from '@timeboxing/shared';
 
 export class MissingRefreshTokenError extends BaseDomainError {

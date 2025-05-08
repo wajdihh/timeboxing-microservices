@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Query } from '@nestjs/common';
+import { Controller, Post, Body, Get, Query, UseGuards, Req } from '@nestjs/common';
 import { RegisterUserRequestDto } from '@identity/application/user/dto/RegisterUserRequestDto';
 import { RegisterUserUseCase } from '@identity/application/user/RegisterUserUseCase';
 import { SwaggerUseCase } from '@timeboxing/shared';
@@ -6,6 +6,10 @@ import { UserResponseDto } from '@identity/application/user/dto/UserResponseDto'
 import { GetUserUseCase } from '@identity/application/user/GetUserUseCase';
 import { GenerateAuthTokensService } from '@identity/application/user/GenerateAuthTokensService';
 import { AuthResponseDto } from '@identity/application/auth/dto/AuthResponseDto';
+import { RequestWithUser } from '../auth/strategies/RequestWithUserValue';
+import { UserMapper } from '@identity/application/user/dto/UserMapper';
+import { InvalidAccessTokenError } from '@identity/domain/auth/erros/InvalidAccessTokenError';
+import { JwtAuthGuard } from '../auth/strategies/JwtAuthGuardInterceptor';
 
 @Controller('user')
 export class UserController {
@@ -28,4 +32,11 @@ export class UserController {
     const response = await this.getUserUseCase.execute(id);
     return response.unwrap(); 
   }  
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  @SwaggerUseCase(GetUserUseCase, [InvalidAccessTokenError]) 
+  async getCurrentUser(@Req() req: RequestWithUser): Promise<UserResponseDto> {
+    return UserMapper.toResponse(req.user);
+  }
 }

@@ -1,4 +1,3 @@
-// domain/errors/InvalidCredentialsError.ts
 import { BaseDomainError, DomainHttpCode } from '@timeboxing/shared';
 
 export class InvalidCredentialsError extends BaseDomainError {

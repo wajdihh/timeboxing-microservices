@@ -4,7 +4,7 @@ import { UserResponseDto } from "./UserResponseDto";
 import { ResultValue } from "@timeboxing/shared";
 import { InvalidEmailError } from "@identity/domain/user/errors/InvalidEmailError";
 
-export class RegisterUserMapper {
+export class UserMapper {
     static toDomain(dto: RegisterUserRequestDto, hashedPassword: string): ResultValue<UserEntity, InvalidEmailError> {
       return UserEntity.create(dto.name, dto.email, hashedPassword);
     }
