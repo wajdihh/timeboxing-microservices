@@ -4,6 +4,7 @@ import { TokenRepository } from '@identity/domain/auth/TokenRepository';
 import { ID, ResultValue } from '@timeboxing/shared';
 import { InvalidRefreshTokenError } from '@identity/domain/auth/erros/InvalidRefreshTokenError';
 import { JwtConfigService } from '@identity/config/JwtConfigService';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class TokenRepositoryAdapter implements TokenRepository {
@@ -12,7 +13,8 @@ export class TokenRepositoryAdapter implements TokenRepository {
     private readonly jwtConfig: JwtConfigService) { }
 
   async generateAccessToken(userId: string, email: string): Promise<ResultValue<string>> {
-    const token = this.jwtService.sign({ sub: userId, email: email },
+    //jti to ensure that every token will differ even if generated in the same second (specially for jest tests)
+    const token = this.jwtService.sign({ sub: userId, email: email, jti: randomUUID() },
       {
         secret: this.jwtConfig.getAccessSecret(),
         expiresIn: this.jwtConfig.getAccessExpiresIn(),

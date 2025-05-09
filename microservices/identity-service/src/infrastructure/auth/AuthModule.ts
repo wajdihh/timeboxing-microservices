@@ -14,6 +14,8 @@ import { JwtOptionsFactory } from '@identity/config/JwtOptionsFactory';
 import { AppConfigModule } from '@identity/config/AppConfigModule';
 import { GenerateAuthTokensService } from '@identity/application/user/GenerateAuthTokensService';
 import { JwtConfigService } from '@identity/config/JwtConfigService';
+import { RefreshStrategy } from './strategies/RefreshStrategy';
+import { RefreshTokenUseCase } from '@identity/application/auth/RefreshTokenUseCase';
 
 @Module({
   imports: [
@@ -28,6 +30,7 @@ import { JwtConfigService } from '@identity/config/JwtConfigService';
   controllers: [AuthController],
   providers: [
     LocalStrategy,
+    RefreshStrategy,
     TokenRepositoryAdapter,
     { provide: TOKEN_REPOSITORY, useExisting: TokenRepositoryAdapter },
     { provide: USER_REPOSITORY, useClass: PrismaUserRepository },
@@ -49,6 +52,12 @@ import { JwtConfigService } from '@identity/config/JwtConfigService';
       useFactory: (userRepository, passwordHasher) =>
         new LoginUseCase(userRepository, passwordHasher),
       inject: [USER_REPOSITORY, PASSWORD_HASHER_PORT],
+    },
+    {
+      provide: RefreshTokenUseCase,
+      useFactory: (userRepository, tokenRepository) =>
+        new RefreshTokenUseCase(userRepository, tokenRepository),
+      inject: [USER_REPOSITORY, TOKEN_REPOSITORY],
     },
   ],
   exports: [

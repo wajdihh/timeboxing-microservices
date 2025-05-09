@@ -3,12 +3,11 @@ import { Injectable } from "@nestjs/common";
 import { AuthTokenType, ResultValue, SuccessStatus, SwaggerUseCaseMetadata } from "@timeboxing/shared";
 import { AuthResponseDto } from "./dto/AuthResponseDto";
 import { TokenRepository } from "@identity/domain/auth/TokenRepository";
-import { UserNotFoundError } from "@identity/domain/user/errors/UserNotFoundError";
 import { InvalidRefreshTokenError } from "@identity/domain/auth/erros/InvalidRefreshTokenError";
-import { AuthMapper } from "./dto/AuthMapper";
+import { UserEntity } from "@identity/domain/user/UserEntity";
 
 @SwaggerUseCaseMetadata({
-    errors: [UserNotFoundError, InvalidRefreshTokenError],
+    errors: [InvalidRefreshTokenError],
     response: AuthResponseDto,
     successStatus: SuccessStatus.CREATED,
     authTokenType: AuthTokenType.AccessToken
@@ -18,34 +17,17 @@ import { AuthMapper } from "./dto/AuthMapper";
 export class RefreshTokenUseCase {
     constructor(private readonly userRepository: UserRepository, private readonly tokenRepository: TokenRepository) { }
 
-    async execute(refreshToken: string): Promise<ResultValue<AuthResponseDto, UserNotFoundError | InvalidRefreshTokenError>> {
+    async execute(refreshToken: string): Promise<ResultValue<UserEntity, InvalidRefreshTokenError>> {
 
         const idResult = await this.tokenRepository.verifyRefreshToken(refreshToken);
         if (idResult.isFail) return ResultValue.error(new InvalidRefreshTokenError())
 
-        const id = idResult.unwrap();        
+        const id = idResult.unwrap();
         const userResult = await this.userRepository.findByID(id)
-        if (userResult.isFail) {
-            return ResultValue.error(new UserNotFoundError(id.value));
-        }
+        if (userResult.isFail) return ResultValue.error(new InvalidRefreshTokenError())
 
         const userValue = userResult.unwrap();
-        if (!userValue) {
-            return ResultValue.error(new UserNotFoundError(id.value));
-        }
-
-        const [accessTokenResult, refreshTokenResult] = await Promise.all([
-            this.tokenRepository.generateAccessToken('userValue', ''),
-            this.tokenRepository.generateRefreshToken('userValue')
-        ]);
-
-        if (accessTokenResult.isFail) return ResultValue.error(accessTokenResult.error);
-        if (refreshTokenResult.isFail) return ResultValue.error(refreshTokenResult.error);
-
-        const accessTokenValue = accessTokenResult.unwrap();
-        const refreshTokenValue = refreshTokenResult.unwrap();
-        const response = AuthMapper.toResponse(accessTokenValue, refreshTokenValue);
-
-        return ResultValue.ok(response);
+        if (!userValue) return ResultValue.error(new InvalidRefreshTokenError())
+        return ResultValue.ok(userValue);
     }
 }

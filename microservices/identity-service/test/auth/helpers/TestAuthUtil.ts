@@ -7,6 +7,7 @@ import { AuthResponseDto } from '@identity/application/auth/dto/AuthResponseDto'
 import { UserMapper } from '@identity/application/user/dto/UserMapper';
 
 export async function createTestUserAndTokens(app: INestApplication): Promise<{ userId: string; tokens: AuthResponseDto }> {
+
   const userRepo = app.get<UserRepository>(USER_REPOSITORY);
   const hasher = app.get(PASSWORD_HASHER_PORT);
   const tokenService = app.get(GenerateAuthTokensService);
@@ -15,10 +16,14 @@ export async function createTestUserAndTokens(app: INestApplication): Promise<{ 
   const hashed = await hasher.hash(testUser.password);
   const userEntity = UserMapper.toDomain(testUser, hashed).unwrap();
 
-  const existingUser = await userRepo.findByEmail(userEntity.email);
-  if (existingUser.isFail || !existingUser.unwrap())
-    await userRepo.save(userEntity);
+  const existingUserResult = await userRepo.findByEmail(userEntity.email);
+  let persistedUser = existingUserResult.isOk ? existingUserResult.unwrap() : null;
 
-  const tokens = await tokenService.execute(userEntity);
-  return { userId: userEntity.id.value, tokens };
+  if (!persistedUser) {
+    await userRepo.save(userEntity);
+    persistedUser = userEntity;
+  }
+    
+  const tokens = await tokenService.execute(persistedUser);
+  return { userId: persistedUser.id.value, tokens };
 }

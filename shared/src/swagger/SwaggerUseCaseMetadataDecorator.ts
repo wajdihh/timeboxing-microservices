@@ -3,7 +3,11 @@ import { DomainHttpCode } from '../errors/DomainHttpStatusCodeUtil';
 
 export type HttpSuccessCode = (typeof DomainHttpCode)[keyof typeof DomainHttpCode];
 export enum AuthTokenType { AccessToken, RefreshToken}
-export enum SuccessStatus { CREATED, OK, NO_CONTENT}
+export enum SuccessStatus {
+  OK = 200,
+  CREATED = 201,
+  NO_CONTENT = 204
+}
 type Constructor<T = unknown> = new (...args: unknown[]) => T;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ErrorConstructor = new (...args: any[]) => Error;

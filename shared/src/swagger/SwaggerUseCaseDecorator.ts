@@ -2,7 +2,7 @@
 import { applyDecorators, Type } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiResponse } from '@nestjs/swagger';
 import { BaseDomainError } from '../errors/BaseDomainError';
-import { AuthTokenType, DomainHttpCode } from '../errors';
+import { AuthTokenType, DomainHttpCode, SuccessStatus } from '../errors';
 
 /**
  * 
@@ -15,7 +15,7 @@ import { AuthTokenType, DomainHttpCode } from '../errors';
 export function SwaggerUseCase(useCaseClass: Type<unknown>) {
   const request = Reflect.getMetadata('usecase:request', useCaseClass);
   const response = Reflect.getMetadata('usecase:response', useCaseClass);
-  const successStatus = Reflect.getMetadata('usecase:successStatus', useCaseClass) ?? 201;
+  const successStatus = Reflect.getMetadata('usecase:successStatus', useCaseClass) ?? SuccessStatus.OK;
   const errors: Array<typeof BaseDomainError> = Reflect.getMetadata('usecase:errors', useCaseClass) ?? [];
   const authTokenType = Reflect.getMetadata('usecase:authTokenType', useCaseClass);
 
@@ -24,10 +24,8 @@ export function SwaggerUseCase(useCaseClass: Type<unknown>) {
   // Add auth tokens
   if (authTokenType === AuthTokenType.AccessToken) {
     decorators.push(ApiBearerAuth('access-token'));
-    console.log('########## token acess')
   } else if (authTokenType === AuthTokenType.RefreshToken) {
     decorators.push(ApiBearerAuth('refresh-token'));
-    console.log('########## token refrsh')
   }
 
   // Request body with example
@@ -46,7 +44,7 @@ export function SwaggerUseCase(useCaseClass: Type<unknown>) {
   }
 
   // Response with example (204 No Content or 200/201 OK)
-  if (successStatus === DomainHttpCode.NO_CONTENT) {
+  if (successStatus === SuccessStatus.NO_CONTENT) {
     decorators.push(
       ApiResponse({
         status: DomainHttpCode.NO_CONTENT,
@@ -54,9 +52,10 @@ export function SwaggerUseCase(useCaseClass: Type<unknown>) {
       })
     );
   } else if (response?.sample) {
+    const successStatusCode = (successStatus === SuccessStatus.OK ? DomainHttpCode.OK : DomainHttpCode.CREATED);
     decorators.push(
       ApiResponse({
-        status: DomainHttpCode.OK,
+        status: successStatusCode,
         description: 'Success',
         schema: {
           example: response.sample(),

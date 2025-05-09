@@ -5,8 +5,6 @@ import { Injectable } from "@nestjs/common";
 import { Strategy as PassportJwtStrategy } from 'passport-jwt';
 import { UserRepository } from "@identity/domain/user/UserRepository";
 import { ID } from "@timeboxing/shared";
-import { UserNotFoundError } from "@identity/domain/user/errors/UserNotFoundError";
-import { InvalidAccessTokenError } from "@identity/domain/auth/erros/InvalidAccessTokenError";
 import { UserEntity } from "@identity/domain/user/UserEntity";
 import { JwtConfigService } from "@identity/config/JwtConfigService";
 
@@ -22,21 +20,14 @@ export class JwtStrategy extends PassportStrategy(PassportJwtStrategy, StrategyT
     });
   }
 
-  async validate(payload: { sub: string }): Promise<UserEntity> {
+  async validate(payload: { sub: string }): Promise<UserEntity | null> {
+    //null because passort will throw 500 error if we use domain exceptions and null = 401
     const idResult = ID.from(payload.sub);
-    if (idResult.isFail) {
-      throw new InvalidAccessTokenError();
-    }
+    if (idResult.isFail) return null
 
     const userResult = await this.userRepository.findByID(idResult.unwrap());
-    if (userResult.isFail) {
-      throw new InvalidAccessTokenError();
-    }
-
+    if (userResult.isFail || !userResult.unwrap()) return null
     const user = userResult.unwrap();
-    if (!user) {
-      throw new UserNotFoundError(payload.sub);
-    }
     return user;
   }
 }

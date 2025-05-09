@@ -6,9 +6,9 @@ import { UserResponseDto } from '@identity/application/user/dto/UserResponseDto'
 import { GetUserUseCase } from '@identity/application/user/GetUserUseCase';
 import { GenerateAuthTokensService } from '@identity/application/user/GenerateAuthTokensService';
 import { AuthResponseDto } from '@identity/application/auth/dto/AuthResponseDto';
-import { RequestWithUser } from '../auth/strategies/RequestWithUserValue';
+import { RequestWithUser } from '../auth/strategies/helpers/RequestWithUserValue';
 import { UserMapper } from '@identity/application/user/dto/UserMapper';
-import { ProtectedByAuthGuard } from '../auth/strategies/JwtAuthGuardDecorator';
+import { ProtectedByAuthGuard } from '../auth/strategies/helpers/JwtAuthGuardDecorator';
 
 @Controller('user')
 export class UserController {
