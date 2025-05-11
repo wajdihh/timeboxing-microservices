@@ -66,8 +66,9 @@ export function SwaggerUseCase(useCaseClass: Type<unknown>) {
 
   // Error examples
   for (const ErrorClass of errors) {
-    const statusCode = (ErrorClass as typeof BaseDomainError).statusCode ?? 400;
-    const message = (ErrorClass as typeof BaseDomainError).swaggerMessage ?? ErrorClass.name;
+    const errorClass = ErrorClass as typeof BaseDomainError;
+    const statusCode = errorClass.statusCode ?? 400;
+    const message = errorClass.swaggerMessage ?? ErrorClass.name;
     const name = ErrorClass.name;
 
     decorators.push(

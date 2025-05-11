@@ -16,6 +16,7 @@ import { GenerateAuthTokensService } from '@identity/application/user/GenerateAu
 import { JwtConfigService } from '@identity/config/JwtConfigService';
 import { RefreshStrategy } from './strategies/RefreshStrategy';
 import { RefreshTokenUseCase } from '@identity/application/auth/RefreshTokenUseCase';
+import { LogoutUseCase } from '@identity/application/auth/LogoutUseCase';
 
 @Module({
   imports: [
@@ -58,6 +59,12 @@ import { RefreshTokenUseCase } from '@identity/application/auth/RefreshTokenUseC
       useFactory: (userRepository, tokenRepository) =>
         new RefreshTokenUseCase(userRepository, tokenRepository),
       inject: [USER_REPOSITORY, TOKEN_REPOSITORY],
+    },
+    {
+      provide: LogoutUseCase,
+      useFactory: (tokenRepository) =>
+        new LogoutUseCase(tokenRepository),
+      inject: [TOKEN_REPOSITORY],
     },
   ],
   exports: [

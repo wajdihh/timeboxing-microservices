@@ -2,8 +2,8 @@ import { applyDecorators, ExecutionContext, Injectable, UseGuards } from '@nestj
 import { AuthGuard } from '@nestjs/passport';
 import { StrategyType } from '../StrategyType';
 import { UserEntity } from '@identity/domain/user/UserEntity';
-import { InvalidAccessTokenError } from '@identity/domain/auth/erros/InvalidAccessTokenError';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { PassportUnauthorizedException } from '@identity/infrastructure/exceptions/PassportUnauthorizedException';
 
 
 export function ProtectedByAuthGuard(): MethodDecorator & ClassDecorator {
@@ -26,9 +26,12 @@ export class JwtAuthGuard extends AuthGuard(StrategyType.JWT) {
     _status?: unknown
     
   ): TUser {
+
+
     if (err || !user || !(user instanceof UserEntity)) {
-      throw new InvalidAccessTokenError();
+      throw new PassportUnauthorizedException();
     }
+
     return user as TUser;
   }
   

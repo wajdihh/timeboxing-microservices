@@ -8,7 +8,10 @@ export class ResultValue<T, E extends Error = Error> {
     Object.freeze(this);
   }
 
-  static ok<T>(value: T): ResultValue<T> {
+  static ok(): ResultValue<void>;
+  static ok<T>(value: T): ResultValue<T>;
+
+  static ok<T>(value?: T): ResultValue<T | void> {
     return new ResultValue<T>(true, false, value);
   }
 

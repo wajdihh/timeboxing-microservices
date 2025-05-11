@@ -63,8 +63,8 @@ export class TokenRepositoryAdapter implements TokenRepository {
     return null;
   }
 
-  async revokeRefreshToken(userId: string): Promise<void> {
+  async revokeRefreshToken(userId: string, refreshToken: string): Promise<ResultValue<void>> {
     // TODO: delete from Redis or cache or DB to manage multisession user and delete on logout to avoid resusibla token
-    return;
+    return ResultValue.ok()
   }
 }

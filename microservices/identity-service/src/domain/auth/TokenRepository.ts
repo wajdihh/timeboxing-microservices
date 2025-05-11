@@ -6,6 +6,6 @@ export interface TokenRepository {
     verifyRefreshToken(token: string): Promise<ResultValue<ID>>;
     saveRefreshToken(userId: string, refreshToken: string): Promise<void>;
     getRefreshToken(userId: string): Promise<string | null>;
-    revokeRefreshToken(userId: string): Promise<void>;
+    revokeRefreshToken(userId: string,refreshToken: string): Promise<ResultValue<void>>;
   }
   export const TOKEN_REPOSITORY = Symbol('TokenRepository');

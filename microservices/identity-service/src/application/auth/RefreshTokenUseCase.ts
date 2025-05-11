@@ -10,7 +10,7 @@ import { UserEntity } from "@identity/domain/user/UserEntity";
     errors: [InvalidRefreshTokenError],
     response: AuthResponseDto,
     successStatus: SuccessStatus.CREATED,
-    authTokenType: AuthTokenType.AccessToken
+    authTokenType: AuthTokenType.RefreshToken
 })
 
 @Injectable()

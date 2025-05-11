@@ -1,4 +1,3 @@
-import { InvalidCredentialsError } from "@identity/domain/auth/erros/InvalidCredentialsError";
 import { InvalidEmailError } from "@identity/domain/user/errors/InvalidEmailError";
 import { UserRepository } from "@identity/domain/user/UserRepository";
 import { Injectable } from "@nestjs/common";
@@ -8,6 +7,7 @@ import { PasswordHasherPort } from "./utils/PasswordHasherPort";
 import { LoginRequestDto } from "./dto/LoginRequestDto";
 import { AuthResponseDto } from "./dto/AuthResponseDto";
 import { UserEntity } from "@identity/domain/user/UserEntity";
+import { InvalidCredentialsError } from "@identity/domain/auth/erros/InvalidCredentialsError";
 
 @SwaggerUseCaseMetadata({
     errors: [InvalidEmailError, InvalidCredentialsError],
