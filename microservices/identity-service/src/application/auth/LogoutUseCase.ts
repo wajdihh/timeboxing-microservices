@@ -17,6 +17,9 @@ export class LogoutUseCase {
         const idResult = await this.tokenRepository.verifyRefreshToken(refreshToken);
         if (idResult.isFail) return ResultValue.error(new InvalidRefreshTokenError());
 
+        //TODO to test
+        await this.tokenRepository.revokeRefreshToken('ss', 'dd');
+
         const id = idResult.unwrap();
         const result = await this.tokenRepository.revokeRefreshToken(id.value, refreshToken);
         if (ResultValue.isFail(result)) return ResultValue.error(new InvalidRefreshTokenError());

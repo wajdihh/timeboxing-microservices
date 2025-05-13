@@ -17,10 +17,12 @@ import { JwtConfigService } from '@identity/config/JwtConfigService';
 import { RefreshStrategy } from './strategies/RefreshStrategy';
 import { RefreshTokenUseCase } from '@identity/application/auth/RefreshTokenUseCase';
 import { LogoutUseCase } from '@identity/application/auth/LogoutUseCase';
+import { RedisIntegrationModule } from '../redis/RedisIntegrationModule';
 
 @Module({
   imports: [
     PrismaModule,
+    RedisIntegrationModule,
     AppConfigModule,
     JwtModule.registerAsync({
       imports: [AppConfigModule],

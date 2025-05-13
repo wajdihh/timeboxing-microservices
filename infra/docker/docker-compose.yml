@@ -10,7 +10,7 @@ services:
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: identity
+      POSTGRES_DB: identitydb
     ports:
       - "5432:5432"
     volumes:
@@ -19,7 +19,15 @@ services:
       test: ["CMD-SHELL", "pg_isready -U $$DB_USER -d $$DB_NAME"]
       interval: 5s
       retries: 5
-      
+
+  redis:
+    image: redis:7
+    container_name: timeboxing_redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
 # Monitoring
   prometheus:
     image: prom/prometheus:latest
@@ -75,6 +83,9 @@ services:
       NODE_ENV: ${NODE_ENV}
     depends_on:
       - prometheus
+      - postgres
+      - redis 
 volumes:
   pgdata:
   grafana-storage:
+  redis_data:

@@ -23,7 +23,7 @@ up env='local':
     -f infra/docker/docker-compose.yml \
     -f infra/docker/docker-compose.override.yml \
     --env-file infra/docker/.env.{{env}} \
-    up --build -d postgres grafana prometheus cadvisor
+    up --build -d postgres grafana prometheus cadvisor redis
 
   @echo "🚀 Starting identity-service locally with NODE_ENV={{env}}"
   #Run the identity-service locally
