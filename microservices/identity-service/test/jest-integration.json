@@ -1,0 +1,14 @@
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": "..",
+  "testRegex": ".*\\.int-spec\\.ts$",
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "moduleNameMapper": {
+    "^@identity/(.*)$": "<rootDir>/src/$1",
+    "^@timeboxing/shared$": "<rootDir>/../../shared/src"
+  },
+  "coverageDirectory": "../coverage",
+  "testEnvironment": "node"
+}

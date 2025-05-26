@@ -13,11 +13,16 @@ export class TokenRepositoryAdapter implements TokenRepository {
   constructor(
     private readonly jwtService: JwtService,
     private readonly jwtConfig: JwtConfigService,
-    private readonly redisService: RedisService) { }
+    private readonly redisService: RedisService) { 
+      this.redisService.setSessionLimit(5);
+    }
+  
 
   async generateAccessToken(userId: string, email: string): Promise<ResultValue<string>> {
     //jti to ensure that every token will differ even if generated in the same second (specially for jest tests)
-    const token = this.jwtService.sign({ sub: userId, email: email, jti: randomUUID() },
+    const jtiGenerated = randomUUID();
+    console.log('### on ACESS jtiGenerated', jtiGenerated);
+    const token = this.jwtService.sign({ sub: userId, email: email, jti: jtiGenerated },
       {
         secret: this.jwtConfig.getAccessSecret(),
         expiresIn: this.jwtConfig.getAccessExpiresIn(),
@@ -26,14 +31,19 @@ export class TokenRepositoryAdapter implements TokenRepository {
     return ResultValue.ok(token);
   }
 
-  async generateRefreshToken(userId: string, sessionId: string): Promise<ResultValue<string>> {
+  async generateRefreshToken(userId: string): Promise<ResultValue<string>> {
+    const jtiGenerated = randomUUID();
+    console.log('### on REFRESH jtiGenerated', jtiGenerated);
     const token = this.jwtService.sign(
-      { sub: userId, sid: sessionId },
+      { sub: userId, jti: jtiGenerated },
       {
         secret: this.jwtConfig.getRefreshSecret(),
         expiresIn: this.jwtConfig.getRefreshExpiresIn(),
       }
     );
+
+    await this.saveSessionId(userId, jtiGenerated);
+
     return ResultValue.ok(token);
   }
 
@@ -42,34 +52,62 @@ export class TokenRepositoryAdapter implements TokenRepository {
       const payload = await this.jwtService.verifyAsync(token, {
         secret: this.jwtConfig.getRefreshSecret(),
       });
-      if (!payload?.sub || !payload?.sid) {
+      if (!payload?.sub || !payload?.jti) {
+        return ResultValue.error(new InvalidRefreshTokenError());
+      }
+
+      const userId = payload.sub;
+      const sessionId = payload.jti;
+      const isSessionValide = await this.isRefreshTokenHasActiveSession(userId, sessionId);
+
+      if (!isSessionValide) {
         return ResultValue.error(new InvalidRefreshTokenError());
       }
 
       const idResult = ID.from(payload.sub);
       if (idResult.isFail) return ResultValue.error(idResult.error);
       const userIdValue = idResult.unwrap();
-      const sessionId = payload.sid;
-      return ResultValue.ok({ userIdValue, sessionId });
+      return ResultValue.ok(userIdValue);
     } catch {
       return ResultValue.error(new InvalidRefreshTokenError());
     }
   }
 
-  async saveRefreshToken(userId: string, sessionId: string, refreshToken: string): Promise<void> {
-    const key = RedisKeys.refreshSession(userId, sessionId);
-    await this.redisService.set(key, refreshToken, this.jwtConfig.getRefreshTtlSeconds());
-    return;
+
+  async revokeRefreshToken(userId: string, sessionId: string): Promise<ResultValue<void>> {
+    const sessionKeyAssosciatedToTheRefreshToken = RedisKeys.jtiSessionKey(sessionId);
+    await this.redisService.deleteValueFromList(sessionKeyAssosciatedToTheRefreshToken, userId);
+    return ResultValue.ok();
   }
 
-  async getRefreshToken(userId: string, sessionId: string): Promise<string | null> {
-    const key = RedisKeys.refreshSession(userId, sessionId);
+  async revokeAllRefreshToken(userId: string): Promise<ResultValue<void>> {
+    //Delete all sessions
+    const userSessionsKey = RedisKeys.userSessionsKey(userId);
+    await this.redisService.deleteAllValueFromList(userSessionsKey, (jti) =>  RedisKeys.jtiSessionKey(jti));
+    return ResultValue.ok();
+  }
+
+  /**
+   * jti is exracted from refresh token, if it is the same as the current session id, then the refresh token is still valid
+   * it's a way to not store refresh token in memory
+   * @param userId 
+   * @param jti (SessionID)
+   * @returns 
+   */
+  private async isRefreshTokenHasActiveSession(userId: string, jti: string): Promise<boolean> {
+    const key = RedisKeys.jtiSessionKey(jti);
+    const sessionId = await this.getSessionId(userId);
+    return sessionId === key;
+  }
+  private async getSessionId(userId: string): Promise<string | null> {
+    const key = RedisKeys.jtiSessionKey(userId);
     return await this.redisService.get(key);
   }
 
-  async revokeRefreshToken(userId: string, sessionId: string): Promise<ResultValue<void>> {
-    const key = RedisKeys.refreshSession(userId, sessionId);
-    await this.redisService.del(key);
+  private async saveSessionId(userId: string, sessionId: string): Promise<void> {
+     const sessionKey = RedisKeys.jtiSessionKey(sessionId);
+     const userSessionsKey = RedisKeys.userSessionsKey(userId);
+     await this.redisService.pushToList(userSessionsKey, sessionKey);
     return;
   }
 }

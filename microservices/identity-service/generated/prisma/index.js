@@ -158,7 +158,7 @@ const config = {
     "db": {
       "url": {
         "fromEnvVar": "DATABASE_URL",
-        "value": "postgresql://example_user:example_password@localhost:5432/identitydb?schema=public"
+        "value": "postgresql://example_user:example_password@localhost:5432/identitydb?schema=e2e"
       }
     }
   },
@@ -168,7 +168,7 @@ const config = {
 }
 
 const fs = require('fs')
-
+// //TODO changed to b?schema=e2e" ? but i should also have public ? 
 config.dirname = __dirname
 if (!fs.existsSync(path.join(__dirname, 'schema.prisma'))) {
   const alternativePaths = [

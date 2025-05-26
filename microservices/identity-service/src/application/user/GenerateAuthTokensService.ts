@@ -20,8 +20,6 @@ export class GenerateAuthTokensService{
     const accessToken = accessTokenResult.unwrap();
     const refreshToken = refreshTokenResult.unwrap();
 
-    await this.tokenRepository.saveRefreshToken(userId, refreshToken);
-
     return AuthMapper.toResponse(accessToken, refreshToken);
   }
 }

@@ -16,5 +16,5 @@ import { RedisService } from './RedisService';
   providers: [RedisService],
   exports: [RedisService],
 })
-//I used this name to avoid RedisModule @lialiaots lib used name conflit
+//I used this name to avoid RedisModule @lialiaots (RedisModule) lib used name conflit
 export class RedisIntegrationModule {}

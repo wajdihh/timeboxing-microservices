@@ -1,10 +1,6 @@
 export class RedisKeys {
   
-  static refreshSession(userId: string, sessionId: string): string {
-    return `refresh:${userId}:${sessionId}`;
-  }
-
-  static sessionList(userId: string): string {
-    return `sessions:${userId}`;
-  }
+  //To manage session for refresh token
+  static jtiSessionKey(jti: string) { return `refresh:jti:${jti}`; }
+  static userSessionsKey(userId: string) { return `sessions:${userId}`; }
 }
