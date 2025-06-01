@@ -5,9 +5,10 @@ import { AuthResponseDto } from "./dto/AuthResponseDto";
 import { TokenRepository } from "@identity/domain/auth/TokenRepository";
 import { InvalidRefreshTokenError } from "@identity/domain/auth/erros/InvalidRefreshTokenError";
 import { UserEntity } from "@identity/domain/user/UserEntity";
+import { InvalidSessionError } from "@identity/domain/auth/erros/InvalidSessionError";
 
 @SwaggerUseCaseMetadata({
-    errors: [InvalidRefreshTokenError],
+    errors: [InvalidRefreshTokenError, InvalidSessionError],
     response: AuthResponseDto,
     successStatus: SuccessStatus.CREATED,
     authTokenType: AuthTokenType.RefreshToken
@@ -17,13 +18,14 @@ import { UserEntity } from "@identity/domain/user/UserEntity";
 export class RefreshTokenUseCase {
     constructor(private readonly userRepository: UserRepository, private readonly tokenRepository: TokenRepository) { }
 
-    async execute(refreshToken: string): Promise<ResultValue<UserEntity, InvalidRefreshTokenError>> {
+    async execute(refreshToken: string): Promise<ResultValue<UserEntity, InvalidRefreshTokenError | InvalidSessionError>> {
 
-        const idResult = await this.tokenRepository.verifyRefreshToken(refreshToken);
-        if (idResult.isFail) return ResultValue.error(new InvalidRefreshTokenError())
+        const verifyResult = await this.tokenRepository.verifyRefreshToken(refreshToken);
+        if (verifyResult.isFail) return ResultValue.error(verifyResult.error)
 
-        const id = idResult.unwrap();
-        const userResult = await this.userRepository.findByID(id)
+        const verify = verifyResult.unwrap();
+        const userId = verify.userId;
+        const userResult = await this.userRepository.findByID(userId)
         if (userResult.isFail) return ResultValue.error(new InvalidRefreshTokenError())
 
         const userValue = userResult.unwrap();

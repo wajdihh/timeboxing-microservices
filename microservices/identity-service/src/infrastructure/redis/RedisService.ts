@@ -25,6 +25,10 @@ export class RedisService {
     }
   }
 
+  async quit(): Promise<void> {
+    await this.redisClient.quit();
+  }
+
   async del(key: string): Promise<void> {
     await this.redisClient.del(key);
   }
@@ -33,6 +37,10 @@ export class RedisService {
     if (limit < 1) throw new Error('maxSessions must be >= 1');
     this.maxSessions = limit;
   }
+   async getValueByKeyFromList(key: string): Promise<string[]> {
+    return await this.redisClient.lrange(key, 0, -1);
+  }
+
   /**
    * Push a value to a redis list identified by the key.
    *
@@ -62,7 +70,7 @@ export class RedisService {
    * To delete all sessions for a user:
    */
   async deleteAllValueFromList(listKey: string, elementKey: (key: string) => string): Promise<void> {
-    const items = await this.redisClient.lrange(listKey, 0, -1);
+    const items = await this.getValueByKeyFromList(listKey);
     await Promise.all(items.map(item => this.redisClient.del(elementKey(item))));
     await this.redisClient.del(listKey);
   }

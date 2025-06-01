@@ -7,6 +7,7 @@ import { StrategyType } from './StrategyType';
 import { RefreshTokenUseCase } from '@identity/application/auth/RefreshTokenUseCase';
 import { UserEntity } from '@identity/domain/user/UserEntity';
 import { RequestWithRefreshTokenValue } from './helpers/RequestWithRefreshTokenValue';
+import { InvalidRefreshTokenError } from '@identity/domain/auth/erros/InvalidRefreshTokenError';
 
 @Injectable()
 export class RefreshStrategy extends PassportStrategy(Strategy, StrategyType.REFRESH) {
@@ -17,10 +18,10 @@ export class RefreshStrategy extends PassportStrategy(Strategy, StrategyType.REF
   async validate(req: Request): Promise<UserEntity | null> {
     //null because passort will throw 500 error if we use domain exceptions and null = 401
     const token = req.headers[RefreshStrategy.headerKey];
-    if (!token || typeof token !== 'string') return null;
+    if (!token || typeof token !== 'string') throw new InvalidRefreshTokenError();
     (req as RequestWithRefreshTokenValue).refreshToken = token;
     const resultUser = await this.refreshUseCase.execute(token);
-    if (resultUser.isFail || !resultUser.unwrap()) return null
+    if (resultUser.isFail || !resultUser.unwrap()) throw resultUser.error;
     return resultUser.unwrap();
   }
 

@@ -7,6 +7,7 @@ import { JwtConfigService } from '@identity/config/JwtConfigService';
 import { randomUUID } from 'crypto';
 import { RedisService } from '../redis/RedisService';
 import { RedisKeys } from '../redis/RedisKeysValue';
+import { InvalidSessionError } from '@identity/domain/auth/erros/InvalidSessionError';
 
 @Injectable()
 export class TokenRepositoryAdapter implements TokenRepository {
@@ -20,20 +21,23 @@ export class TokenRepositoryAdapter implements TokenRepository {
 
   async generateAccessToken(userId: string, email: string): Promise<ResultValue<string>> {
     //jti to ensure that every token will differ even if generated in the same second (specially for jest tests)
+    try {
     const jtiGenerated = randomUUID();
-    console.log('### on ACESS jtiGenerated', jtiGenerated);
-    const token = this.jwtService.sign({ sub: userId, email: email, jti: jtiGenerated },
+    const token = this.jwtService.sign(
+      { sub: userId, email: email, jti: jtiGenerated },
       {
         secret: this.jwtConfig.getAccessSecret(),
         expiresIn: this.jwtConfig.getAccessExpiresIn(),
       }
     );
     return ResultValue.ok(token);
+  } catch (error) {
+    return ResultValue.error(error as Error);
+  }
   }
 
   async generateRefreshToken(userId: string): Promise<ResultValue<string>> {
     const jtiGenerated = randomUUID();
-    console.log('### on REFRESH jtiGenerated', jtiGenerated);
     const token = this.jwtService.sign(
       { sub: userId, jti: jtiGenerated },
       {
@@ -47,7 +51,7 @@ export class TokenRepositoryAdapter implements TokenRepository {
     return ResultValue.ok(token);
   }
 
-  async verifyRefreshToken(token: string): Promise<ResultValue<ID>> {
+  async verifyRefreshToken(token: string): Promise<ResultValue<{userId: ID, sessionID: string}>> {
     try {
       const payload = await this.jwtService.verifyAsync(token, {
         secret: this.jwtConfig.getRefreshSecret(),
@@ -60,14 +64,16 @@ export class TokenRepositoryAdapter implements TokenRepository {
       const sessionId = payload.jti;
       const isSessionValide = await this.isRefreshTokenHasActiveSession(userId, sessionId);
 
+      console.log('isSessionValide', isSessionValide);
+
       if (!isSessionValide) {
-        return ResultValue.error(new InvalidRefreshTokenError());
+        return ResultValue.error(new InvalidSessionError());
       }
 
       const idResult = ID.from(payload.sub);
       if (idResult.isFail) return ResultValue.error(idResult.error);
       const userIdValue = idResult.unwrap();
-      return ResultValue.ok(userIdValue);
+      return ResultValue.ok({userId: userIdValue, sessionID: sessionId});
     } catch {
       return ResultValue.error(new InvalidRefreshTokenError());
     }
@@ -75,15 +81,21 @@ export class TokenRepositoryAdapter implements TokenRepository {
 
 
   async revokeRefreshToken(userId: string, sessionId: string): Promise<ResultValue<void>> {
-    const sessionKeyAssosciatedToTheRefreshToken = RedisKeys.jtiSessionKey(sessionId);
-    await this.redisService.deleteValueFromList(sessionKeyAssosciatedToTheRefreshToken, userId);
+    const sessionKey = RedisKeys.sessionKey(sessionId);
+    const userSessionsKey = RedisKeys.userSessionsKey(userId);
+    
+    // Delete the session key from Redis
+    await this.redisService.del(sessionKey);
+    // Remove the session key from user's sessions list
+    await this.redisService.deleteValueFromList(userSessionsKey, sessionKey);
+    
     return ResultValue.ok();
   }
 
   async revokeAllRefreshToken(userId: string): Promise<ResultValue<void>> {
     //Delete all sessions
     const userSessionsKey = RedisKeys.userSessionsKey(userId);
-    await this.redisService.deleteAllValueFromList(userSessionsKey, (jti) =>  RedisKeys.jtiSessionKey(jti));
+    await this.redisService.deleteAllValueFromList(userSessionsKey, (jti) =>  RedisKeys.sessionKey(jti));
     return ResultValue.ok();
   }
 
@@ -95,18 +107,21 @@ export class TokenRepositoryAdapter implements TokenRepository {
    * @returns 
    */
   private async isRefreshTokenHasActiveSession(userId: string, jti: string): Promise<boolean> {
-    const key = RedisKeys.jtiSessionKey(jti);
-    const sessionId = await this.getSessionId(userId);
-    return sessionId === key;
+    const sessions = await this.getSessionsId(userId);
+    if (!sessions) return false;
+    
+    // Check if any session in the list matches this jti
+    return sessions.some(session => session.endsWith(jti));
   }
-  private async getSessionId(userId: string): Promise<string | null> {
-    const key = RedisKeys.jtiSessionKey(userId);
-    return await this.redisService.get(key);
+  private async getSessionsId(userId: string): Promise<string[] | null> {
+    const key = RedisKeys.userSessionsKey(userId);
+    return await this.redisService.getValueByKeyFromList(key);
   }
 
   private async saveSessionId(userId: string, sessionId: string): Promise<void> {
-     const sessionKey = RedisKeys.jtiSessionKey(sessionId);
+     const sessionKey = RedisKeys.sessionKey(sessionId);
      const userSessionsKey = RedisKeys.userSessionsKey(userId);
+     console.log('User sessions key', userSessionsKey, 'Session Id key', sessionKey);
      await this.redisService.pushToList(userSessionsKey, sessionKey);
     return;
   }

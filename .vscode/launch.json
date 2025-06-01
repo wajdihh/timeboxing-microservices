@@ -11,6 +11,16 @@
       "sourceMaps": true,
       "skipFiles": ["<node_internals>/**"],
       "outFiles": ["${workspaceFolder}/microservices/identity-service/dist/**/*.js"]
+    },
+    {
+      "name": "Attach to Jest E2E",
+      "type": "node",
+      "request": "attach",
+      "port": 9229,
+      "protocol": "inspector",
+      "restart": true,
+      "sourceMaps": true,
+      "skipFiles": ["<node_internals>/**"]
     }
   ]
 }

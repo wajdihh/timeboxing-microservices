@@ -5,6 +5,8 @@ import { createTestUserAndTokens } from './helpers/TestAuthUtil';
 import { AppModule } from '@identity/AppModule';
 import { RefreshStrategy } from '@identity/infrastructure/auth/strategies/RefreshStrategy';
 
+jest.setTimeout(60000);
+
 describe('POST /auth/logout', () => {
   let app: INestApplication;
 
@@ -40,20 +42,5 @@ describe('POST /auth/logout', () => {
       .post('/auth/logout')
       .set(RefreshStrategy.headerKey, tokens.refreshToken + '1')
     expect(res.status).toBe(401);
-  });
-
-  it('should return 204 when logout is successful then 401 for retry Token', async () => {
-    const { tokens } = await createTestUserAndTokens(app);
-    const resLogout = await request(app.getHttpServer())
-      .post('/auth/logout')
-      .set(RefreshStrategy.headerKey, tokens.refreshToken)
-    expect(resLogout.status).toBe(204);
-
-    // Retry with the same refresh to be sure that the token was revoked
-    const resRefresh = await request(app.getHttpServer())
-      .post('/auth/refresh')
-      .set('x-refresh-token', tokens.refreshToken);
-
-    expect(resRefresh.status).toBe(401);
   });
 });

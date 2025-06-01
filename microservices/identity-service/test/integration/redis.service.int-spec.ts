@@ -2,11 +2,9 @@ import { RedisService } from '@identity/infrastructure/redis/RedisService';
 import { Test } from '@nestjs/testing';
 import { RedisModule } from '@liaoliaots/nestjs-redis';
 import { ConfigModule } from '@nestjs/config';
-import Redis from 'ioredis';
 
 describe('RedisService (Integration)', () => {
   let redisService: RedisService;
-  let rawRedis: Redis;
 
   const testKey = 'test:key';
   const listKey = 'test:list:key';
@@ -26,16 +24,15 @@ describe('RedisService (Integration)', () => {
     }).compile();
 
     redisService = moduleRef.get(RedisService);
-    rawRedis = new Redis();
   });
 
   afterEach(async () => {
-    await rawRedis.del(testKey);
-    await rawRedis.del(listKey);
+    await redisService.del(testKey);
+    await redisService.del(listKey);
   });
 
   afterAll(async () => {
-    await rawRedis.quit();
+    await redisService.quit();
   });
 
   it('should set and get a value', async () => {
@@ -56,21 +53,37 @@ describe('RedisService (Integration)', () => {
     await redisService.pushToList(listKey, 'two');
     await redisService.deleteValueFromList(listKey, 'one');
 
-    const result = await rawRedis.lrange(listKey, 0, -1);
+    const result = await redisService.getValueByKeyFromList(listKey);
     expect(result).toEqual(['two']);
+  });
+
+  it('should push and get a value from list', async () => {
+    await redisService.pushToList(listKey, 'session1');
+    const listValues = await redisService.getValueByKeyFromList(listKey);
+    expect(listValues).toContain('session1');
+  });
+
+    it('should push and check if value exists for a given key', async () => {
+    await redisService.pushToList(listKey, 'session1');
+    await redisService.pushToList(listKey, 'session2');
+    await redisService.pushToList(listKey, 'session3');
+
+    const listValues = await redisService.getValueByKeyFromList(listKey);
+    expect(listValues).not.toContain('session5');
+    expect(listValues).toContain('session2');
   });
 
   it('should delete all values from a list with custom key resolver', async () => {
     await redisService.pushToList(listKey, 'session1');
     await redisService.pushToList(listKey, 'session2');
 
-    await rawRedis.set('session:session1', 'value1');
-    await rawRedis.set('session:session2', 'value2');
+    await redisService.set('session:session1', 'value1');
+    await redisService.set('session:session2', 'value2');
 
     await redisService.deleteAllValueFromList(listKey, (jti) => `session:${jti}`);
 
-    const session1 = await rawRedis.get('session:session1');
-    const session2 = await rawRedis.get('session:session2');
+    const session1 = await redisService.get('session:session1');
+    const session2 = await redisService.get('session:session2');
     expect(session1).toBeNull();
     expect(session2).toBeNull();
   });

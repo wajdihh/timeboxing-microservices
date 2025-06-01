@@ -1,4 +1,4 @@
-import { Controller, Post, UseGuards, Req } from '@nestjs/common';
+import { Controller, Post, UseGuards, Req, HttpCode } from '@nestjs/common';
 import { SwaggerUseCase } from '@timeboxing/shared';
 import { LoginUseCase } from '@identity/application/auth/LoginUseCase';
 import { AuthResponseDto } from '@identity/application/auth/dto/AuthResponseDto';
@@ -35,8 +35,9 @@ export class AuthController {
   @HeaderRefreshToken()
   @SwaggerUseCase(LogoutUseCase)
   @Post('logout')
+  @HttpCode(204)
   async logout(@Req() req: RequestWithRefreshTokenValue): Promise<void> {
     await this.logoutUseCase.execute(req.refreshToken);
-    return ; // Return nothing to trigger 204 by Nest
+    return ; // Return nothing to trigger 201 by Nest
   }
 }

@@ -19,6 +19,7 @@
     "test:unit": "tools/with-env.sh npx jest --config ./test/jest-unit.json",
     "test:int": "tools/with-env.sh npx jest --config ./test/jest-integration.json --detectOpenHandles --forceExit ",
     "test:e2e": "tools/with-env.sh npx jest --config ./test/jest-e2e.json",
+    "test:e2e:debug": "tools/with-env.sh node --inspect ../../node_modules/.bin/jest --runInBand --config ./test/jest-e2e.json",
     "test:all": "tools/with-env.sh npx jest --runInBand",
     "prisma:generate": "tools/with-env.sh prisma generate",
     "prisma:migrate": "tools/with-env.sh prisma migrate dev",
