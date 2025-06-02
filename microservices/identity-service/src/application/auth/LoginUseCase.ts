@@ -30,9 +30,12 @@ export class LoginUseCase {
         private readonly passwordHashPort: PasswordHasherPort) { }
 
     async execute(dto: LoginRequestDto): Promise<ResultValue<UserEntity, InvalidCredentialsError | InvalidEmailError>> {
-
         const email = dto.email;
         const password = dto.password;
+
+        if (!password) {
+            return ResultValue.error(new InvalidCredentialsError());
+        }
 
         const emailResult = EmailValue.create(email);
         if (emailResult.isFail) return ResultValue.error(new InvalidEmailError(email));
