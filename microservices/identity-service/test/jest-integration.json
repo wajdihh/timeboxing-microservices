@@ -9,6 +9,18 @@
     "^@identity/(.*)$": "<rootDir>/src/$1",
     "^@timeboxing/shared$": "<rootDir>/../../shared/src"
   },
-  "coverageDirectory": "../coverage",
+  "coverageDirectory": "coverage",
+  "collectCoverageFrom": [
+    "src/infrastructure/**/*.ts",
+    "!src/infrastructure/**/*.module.ts",
+    "!src/infrastructure/**/index.ts",
+    "!src/infrastructure/**/entities/*", 
+    "!src/infrastructure/**/dto/*",
+    "!src/infrastructure/**/guards/*",
+    "!src/infrastructure/**/strategies/*",
+    "!src/infrastructure/**/tools/*",
+    "!src/infrastructure/**/filters/*",
+    "!src/infrastructure/**/exceptions/*"
+  ],
   "testEnvironment": "node"
 }

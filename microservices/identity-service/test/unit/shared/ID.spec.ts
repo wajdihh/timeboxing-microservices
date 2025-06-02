@@ -1,4 +1,4 @@
-import { ID } from "@timeboxing/shared";
+import { ID, InvalidIDError } from "@timeboxing/shared";
 
 describe('ID Value Object', () => {
 
@@ -11,7 +11,7 @@ describe('ID Value Object', () => {
   it('should fail if input is not a valid UUID', () => {
     const result = ID.from('invalid-string');
     expect(result.isFail).toBe(true);
-    expect(result.error).toBeInstanceOf(TypeError);
+    expect(result.error).toBeInstanceOf(InvalidIDError);
   });
 
   it('should return the same ID if given an ID instance', () => {

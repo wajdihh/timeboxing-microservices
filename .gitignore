@@ -17,3 +17,6 @@ logs/
 # Dependency lockfiles (optional for consistency)
 package-lock.json
 yarn.lock
+
+# Coverage reports
+coverage/

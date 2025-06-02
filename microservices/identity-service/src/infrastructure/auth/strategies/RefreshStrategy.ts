@@ -15,8 +15,7 @@ export class RefreshStrategy extends PassportStrategy(Strategy, StrategyType.REF
     super();
   }
 
-  async validate(req: Request): Promise<UserEntity | null> {
-    //null because passort will throw 500 error if we use domain exceptions and null = 401
+  async validate(req: Request): Promise<UserEntity> {
     const token = req.headers[RefreshStrategy.headerKey];
     if (!token || typeof token !== 'string') throw new InvalidRefreshTokenError();
     (req as RequestWithRefreshTokenValue).refreshToken = token;

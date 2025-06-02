@@ -6,6 +6,7 @@ import { TokenRepositoryAdapter } from '@identity/infrastructure/auth/TokenRepos
 import { Test } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { ID } from '@timeboxing/shared';
+import { InvalidSessionError } from '@identity/domain/auth/erros/InvalidSessionError';
 
 jest.mock('@nestjs/jwt');
 jest.mock('@identity/config/JwtConfigService');
@@ -159,7 +160,7 @@ describe('TokenRepositoryAdapter', () => {
 
       const result = await tokenRepo.verifyRefreshToken('invalidToken');
       expect(result.isFail).toBe(true);
-      expect(result.error).toBeInstanceOf(InvalidRefreshTokenError);
+      expect(result.error).toBeInstanceOf(InvalidSessionError);
     });
 
     it('should fail if ID.from fails', async () => {

@@ -11,11 +11,11 @@ export class LocalStrategy extends PassportStrategy(Strategy, StrategyType.LOCAL
     super({ usernameField: 'email' });
   }
 
-  async validate(email: string, password: string): Promise<UserEntity | null> {
+  async validate(email: string, password: string): Promise<UserEntity> {
     //null because passort will throw 500 error if we use domain exceptions and null = 401
     const loginRequestDto = { email, password };
     const response = await this.loginUseCase.execute(loginRequestDto);
-    if (response.isFail || !response.unwrap()) return null
+    if (response.isFail || !response.unwrap()) throw response.error;
     return response.unwrap();
-  }
+}
 }

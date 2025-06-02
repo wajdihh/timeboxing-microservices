@@ -1,15 +1,14 @@
-import { Controller, Post, UseGuards, Req, HttpCode } from '@nestjs/common';
+import { Controller, Post, Req, HttpCode } from '@nestjs/common';
 import { SwaggerUseCase } from '@timeboxing/shared';
 import { LoginUseCase } from '@identity/application/auth/LoginUseCase';
 import { AuthResponseDto } from '@identity/application/auth/dto/AuthResponseDto';
-import { AuthGuard } from '@nestjs/passport';
-import { StrategyType } from './strategies/StrategyType';
 import { RequestWithUser } from './strategies/helpers/RequestWithUserValue';
 import { GenerateAuthTokensService } from '@identity/application/user/GenerateAuthTokensService';
 import { RefreshTokenUseCase } from '@identity/application/auth/RefreshTokenUseCase';
-import { HeaderRefreshToken } from './strategies/helpers/JwtRefreshTokenDecorator';
+import { AddHeaderRefreshToken } from './strategies/helpers/JwtAddHeaderRefreshTokenDecorator';
 import { LogoutUseCase } from '@identity/application/auth/LogoutUseCase';
 import { RequestWithRefreshTokenValue } from './strategies/helpers/RequestWithRefreshTokenValue';
+import { AddLocalGuard } from './strategies/helpers/JwtAddLocalGuardDecorator';
 
 @Controller('auth')
 export class AuthController {
@@ -19,20 +18,20 @@ export class AuthController {
   ) { }
 
   @SwaggerUseCase(LoginUseCase)
-  @UseGuards(AuthGuard(StrategyType.LOCAL))
+  @AddLocalGuard()
   @Post('login')
   async login(@Req() req: RequestWithUser): Promise<AuthResponseDto> {
     return this.generateAuthTokensService.execute(req.user);
   }
 
-  @HeaderRefreshToken()
+  @AddHeaderRefreshToken()
   @SwaggerUseCase(RefreshTokenUseCase)
   @Post('refresh')
   async refresh(@Req() req: RequestWithUser): Promise<AuthResponseDto> {
     return this.generateAuthTokensService.execute(req.user);
   }
 
-  @HeaderRefreshToken()
+  @AddHeaderRefreshToken()
   @SwaggerUseCase(LogoutUseCase)
   @Post('logout')
   @HttpCode(204)

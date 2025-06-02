@@ -8,7 +8,7 @@ import { GenerateAuthTokensService } from '@identity/application/user/GenerateAu
 import { AuthResponseDto } from '@identity/application/auth/dto/AuthResponseDto';
 import { RequestWithUser } from '../auth/strategies/helpers/RequestWithUserValue';
 import { UserMapper } from '@identity/application/user/dto/UserMapper';
-import { ProtectedByAuthGuard } from '../auth/strategies/helpers/JwtAuthGuardDecorator';
+import { ProtectByAuthGuard } from '../auth/strategies/helpers/JwtProtectByAuthGuardDecorator';
 
 @Controller('user')
 export class UserController {
@@ -32,7 +32,7 @@ export class UserController {
     return response.unwrap(); 
   }  
 
-  @ProtectedByAuthGuard()
+  @ProtectByAuthGuard()
   @Get('me')
   @SwaggerUseCase(GetUserUseCase) 
   async getCurrentUser(@Req() req: RequestWithUser): Promise<UserResponseDto> {

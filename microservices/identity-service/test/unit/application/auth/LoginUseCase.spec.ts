@@ -92,4 +92,21 @@ describe('LoginUseCase', () => {
     expect(result.isOk).toBe(false);
     expect(result.error).toBeInstanceOf(InvalidCredentialsError);
   });
+
+  it('should return InvalidCredentialsError if userRepository.findByEmail fails', async () => {
+    // Given
+    const email = 'test@example.com';
+    const password = 'password123';
+    // Simulate a failure in the repository layer
+    mockUserRepo.findByEmail.mockResolvedValue(ResultValue.error(new Error('Database error')));
+
+    // When
+    const result = await useCase.execute({ email, password });
+
+    // Then
+    expect(result.isOk).toBe(false);
+    expect(result.error).toBeInstanceOf(InvalidCredentialsError);
+    expect(mockUserRepo.findByEmail).toHaveBeenCalledWith(expect.objectContaining({ value: email }));
+    expect(mockPasswordHasher.compare).not.toHaveBeenCalled(); // Password comparison should not be reached
+  });
 });

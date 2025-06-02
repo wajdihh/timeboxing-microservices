@@ -6,7 +6,7 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 import { PassportUnauthorizedException } from '@identity/infrastructure/exceptions/PassportUnauthorizedException';
 
 
-export function ProtectedByAuthGuard(): MethodDecorator & ClassDecorator {
+export function ProtectByAuthGuard(): MethodDecorator & ClassDecorator {
   return applyDecorators(
     UseGuards(JwtAuthGuard),
     ApiBearerAuth('access-token'),

@@ -23,10 +23,11 @@ afterAll(async () => {
   await app.close();
 });
 
-describe('POST /auth/refresh', () => {
+describe('AuthController (e2e) - /auth/refresh', () => {
   it('should return 401 if x-refresh-token header is missing', async () => {
     const res = await request(app.getHttpServer()).post('/auth/refresh');
     expect(res.status).toBe(401);
+    expect(res.body.error).toBe('InvalidRefreshTokenError');
   });
 
   it('should return 401 if refresh token is malformed', async () => {
@@ -34,6 +35,7 @@ describe('POST /auth/refresh', () => {
       .post('/auth/refresh')
       .set(RefreshStrategy.headerKey, 'invalid.token.value');
     expect(res.status).toBe(401);
+    expect(res.body.error).toBe('InvalidRefreshTokenError');
   });
 
   it('should return new access token for valid refresh token', async () => {
@@ -55,11 +57,12 @@ describe('POST /auth/refresh', () => {
       .post('/auth/refresh')
       .set(RefreshStrategy.headerKey, tamperedToken);
     expect(res.status).toBe(401);
+    expect(res.body.error).toBe('InvalidRefreshTokenError');
   });
 });
 
 describe('Mixed calls aka Login , Logout etc.. with /auth/refresh', () => {
-  it('should return 401 if refresh token has been revoked', async () => {
+  it('should return 401 if refresh token has been revoked : Empty Redis Session', async () => {
     const { tokens } = await createTestUserAndTokens(app);
     await request(app.getHttpServer())
       .post('/auth/logout')
@@ -71,6 +74,7 @@ describe('Mixed calls aka Login , Logout etc.. with /auth/refresh', () => {
       .set(RefreshStrategy.headerKey, tokens.refreshToken);
 
     expect(res.status).toBe(401);
+    expect(res.body.error).toBe('InvalidSessionError');
   });
 
   it('should allow refresh token issued via login endpoint', async () => {

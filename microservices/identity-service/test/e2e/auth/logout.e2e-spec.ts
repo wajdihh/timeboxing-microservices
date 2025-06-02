@@ -7,7 +7,7 @@ import { RefreshStrategy } from '@identity/infrastructure/auth/strategies/Refres
 
 jest.setTimeout(60000);
 
-describe('POST /auth/logout', () => {
+describe('AuthController (e2e) - /auth/logout', () => {
   let app: INestApplication;
 
   beforeAll(async () => {
@@ -26,6 +26,7 @@ describe('POST /auth/logout', () => {
   it('should return 401 if x-refresh-token header is missing', async () => {
     const res = await request(app.getHttpServer()).post('/auth/refresh');
     expect(res.status).toBe(401);
+    expect(res.body.error).toBe('InvalidRefreshTokenError');
   });
 
   it('should return 401 if refresh token is malformed', async () => {
@@ -33,6 +34,7 @@ describe('POST /auth/logout', () => {
       .post('/auth/logout')
       .set(RefreshStrategy.headerKey, 'invalid.token.value')
     expect(res.status).toBe(401);
+    expect(res.body.error).toBe('InvalidRefreshTokenError');
   });
 
   it('should return 401 if refresh token is unvalid', async () => {
@@ -42,5 +44,6 @@ describe('POST /auth/logout', () => {
       .post('/auth/logout')
       .set(RefreshStrategy.headerKey, tokens.refreshToken + '1')
     expect(res.status).toBe(401);
+    expect(res.body.error).toBe('InvalidRefreshTokenError');
   });
 });

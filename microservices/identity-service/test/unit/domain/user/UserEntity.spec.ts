@@ -42,4 +42,26 @@ describe('UserEntity', () => {
   expect(result.isOk).toBe(false);
   expect(result.error).toBeInstanceOf(InvalidIDError);
 });
+
+  it('should successfully restore a user with valid props', () => {
+    const validId = '123e4567-e89b-12d3-a456-426614174000'; // A valid UUID
+    const props = {
+      id: validId,
+      name: 'Jane Doe',
+      email: 'jane@example.com',
+      passwordHash: 'anotherHashedPassword',
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    const result = UserEntity.restore(props);
+    expect(result.isOk).toBe(true);
+    const user = result.unwrap();
+    expect(user).toBeInstanceOf(UserEntity);
+    expect(user.id.value).toBe(validId);
+    expect(user.name).toBe(props.name);
+    expect(user.email.value).toBe(props.email);
+    expect(user.passwordHash).toBe(props.passwordHash);
+    expect(user.createdAt).toEqual(props.createdAt);
+    expect(user.updatedAt).toEqual(props.updatedAt);
+  });
 });
