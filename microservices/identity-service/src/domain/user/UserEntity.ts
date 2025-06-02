@@ -15,23 +15,25 @@ export class UserEntity {
     static create(name: string, email: string, passwordHash: string): ResultValue<UserEntity, InvalidEmailError> {
         const emailResult = EmailValue.create(email);
         if (!emailResult.isOk) {
-            ResultValue.error(emailResult.error);
+            return ResultValue.error(emailResult.error);
         }
         const user = new UserEntity(ID.generate(), name, emailResult.unwrap(), passwordHash, new Date(), new Date());
         return ResultValue.ok(user);
     }
 
     //For restoring from persistence (e.g. Prisma)
-    static restore(props: { id: string; name: string; email: string; passwordHash: string; createdAt: Date; updatedAt: Date; }):  ResultValue<UserEntity, TypeError> {
+    static restore(props: { id: string; name: string; email: string; passwordHash: string; createdAt: Date; updatedAt: Date; }): ResultValue<UserEntity, InvalidEmailError | TypeError> {
 
         const idResult = ID.from(props.id);
         if (idResult.isFail) return ResultValue.error(idResult.error);
-        const idValue = idResult.unwrap();
+
+        const emailResult = EmailValue.create(props.email);
+        if (emailResult.isFail) return ResultValue.error(emailResult.error);
 
         const user = new UserEntity(
-            idValue,
+            idResult.unwrap(),
             props.name,
-            EmailValue.create(props.email).unwrap(),
+            emailResult.unwrap(),
             props.passwordHash,
             props.createdAt,
             props.updatedAt

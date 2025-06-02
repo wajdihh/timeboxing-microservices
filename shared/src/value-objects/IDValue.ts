@@ -1,10 +1,11 @@
+import { InvalidIDError } from "../errors";
 import { ResultValue } from "./ResultValue";
 
 export class ID {
 
   private constructor(private readonly _value: string) { }
 
-  static from(value: string | ID | { _value: string }): ResultValue<ID, TypeError> {
+  static from(value: string | ID | { _value: string }): ResultValue<ID, InvalidIDError> {
     if (value instanceof ID) {
       return ResultValue.ok(value);
     }
@@ -19,11 +20,11 @@ export class ID {
     }
   
     if (typeof value !== 'string') {
-      return ResultValue.error(new TypeError(`ID must be created from a string. Received: ${typeof value}`));
+      return ResultValue.error(new InvalidIDError(`ID must be created from a string. Received: ${typeof value}`));
     }
   
     if (!UUID_REGEX.test(value)) {
-      return ResultValue.error(new TypeError(`Invalid UUID format: ${value}`));
+      return ResultValue.error(new InvalidIDError(`Invalid UUID format: ${value}`));
     }
     return ResultValue.ok(new ID(value));
   }
