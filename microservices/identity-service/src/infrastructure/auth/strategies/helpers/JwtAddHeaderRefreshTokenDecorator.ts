@@ -2,14 +2,14 @@ import { applyDecorators, ExecutionContext, HttpException, HttpStatus, Injectabl
 import { AuthGuard } from '@nestjs/passport';
 import { StrategyType } from '../StrategyType';
 import { ApiHeader, ApiResponse } from '@nestjs/swagger';
-import { InvalidRefreshTokenError } from '@identity/domain/auth/erros/InvalidRefreshTokenError';
+import { InvalidRefreshTokenError } from '@identity/domain/auth/errors/InvalidRefreshTokenError';
 import { RefreshStrategy } from '../RefreshStrategy';
 import { UserEntity } from '@identity/domain/user/UserEntity';
 import { BaseDomainError } from '@timeboxing/shared';
 
 export function AddHeaderRefreshToken(): MethodDecorator & ClassDecorator {
   return applyDecorators(
-    UseGuards(CustomRedreshGuard),
+    UseGuards(CustomRefreshGuard),
     ApiHeader({
       name: RefreshStrategy.headerKey,
       description: 'Refresh token',
@@ -23,7 +23,7 @@ export function AddHeaderRefreshToken(): MethodDecorator & ClassDecorator {
 }
 
 @Injectable()
-export class CustomRedreshGuard extends AuthGuard(StrategyType.REFRESH) { // Class is not generic
+export class CustomRefreshGuard extends AuthGuard(StrategyType.REFRESH) { // Class is not generic
   // eslint-disable-next-line @typescript-eslint/no-unused-vars , @typescript-eslint/no-explicit-any
   handleRequest(err: unknown, user: UserEntity | false | null, info: { message: string } | string | null, _context: ExecutionContext, _status?: unknown): any { 
     if (err instanceof BaseDomainError) {

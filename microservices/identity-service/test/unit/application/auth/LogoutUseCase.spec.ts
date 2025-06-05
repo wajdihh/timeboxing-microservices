@@ -1,6 +1,6 @@
 import { LogoutUseCase } from '@identity/application/auth/LogoutUseCase';
 import { TokenRepository } from '@identity/domain/auth/TokenRepository';
-import { InvalidRefreshTokenError } from '@identity/domain/auth/erros/InvalidRefreshTokenError';
+import { InvalidRefreshTokenError } from '@identity/domain/auth/errors/InvalidRefreshTokenError';
 import { ID, ResultValue } from '@timeboxing/shared';
 
 describe('LogoutUseCase', () => {

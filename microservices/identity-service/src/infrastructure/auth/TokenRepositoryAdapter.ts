@@ -2,12 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { TokenRepository } from '@identity/domain/auth/TokenRepository';
 import { ID, ResultValue } from '@timeboxing/shared';
-import { InvalidRefreshTokenError } from '@identity/domain/auth/erros/InvalidRefreshTokenError';
+import { InvalidRefreshTokenError } from '@identity/domain/auth/errors/InvalidRefreshTokenError';
 import { JwtConfigService } from '@identity/config/JwtConfigService';
 import { randomUUID } from 'crypto';
 import { RedisService } from '../redis/RedisService';
 import { RedisKeys } from '../redis/RedisKeysValue';
-import { InvalidSessionError } from '@identity/domain/auth/erros/InvalidSessionError';
+import { InvalidSessionError } from '@identity/domain/auth/errors/InvalidSessionError';
 
 @Injectable()
 export class TokenRepositoryAdapter implements TokenRepository {

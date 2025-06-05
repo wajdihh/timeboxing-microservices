@@ -3,9 +3,9 @@ import { Injectable } from "@nestjs/common";
 import { AuthTokenType, ResultValue, SuccessStatus, SwaggerUseCaseMetadata } from "@timeboxing/shared";
 import { AuthResponseDto } from "./dto/AuthResponseDto";
 import { TokenRepository } from "@identity/domain/auth/TokenRepository";
-import { InvalidRefreshTokenError } from "@identity/domain/auth/erros/InvalidRefreshTokenError";
+import { InvalidRefreshTokenError } from "@identity/domain/auth/errors/InvalidRefreshTokenError";
 import { UserEntity } from "@identity/domain/user/UserEntity";
-import { InvalidSessionError } from "@identity/domain/auth/erros/InvalidSessionError";
+import { InvalidSessionError } from "@identity/domain/auth/errors/InvalidSessionError";
 
 @SwaggerUseCaseMetadata({
     errors: [InvalidRefreshTokenError, InvalidSessionError],

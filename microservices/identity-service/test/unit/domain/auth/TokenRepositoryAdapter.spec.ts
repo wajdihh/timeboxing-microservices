@@ -1,12 +1,12 @@
 import { JwtService } from '@nestjs/jwt';
 import { JwtConfigService } from '@identity/config/JwtConfigService';
 import { RedisService } from '@identity/infrastructure/redis/RedisService';
-import { InvalidRefreshTokenError } from '@identity/domain/auth/erros/InvalidRefreshTokenError';
+import { InvalidRefreshTokenError } from '@identity/domain/auth/errors/InvalidRefreshTokenError';
 import { TokenRepositoryAdapter } from '@identity/infrastructure/auth/TokenRepositoryAdapter';
 import { Test } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { ID } from '@timeboxing/shared';
-import { InvalidSessionError } from '@identity/domain/auth/erros/InvalidSessionError';
+import { InvalidSessionError } from '@identity/domain/auth/errors/InvalidSessionError';
 
 jest.mock('@nestjs/jwt');
 jest.mock('@identity/config/JwtConfigService');
