@@ -2,8 +2,8 @@ import { RefreshTokenUseCase } from '@identity/application/auth/RefreshTokenUseC
 import { TokenRepository } from '@identity/domain/auth/TokenRepository';
 import { UserRepository } from '@identity/domain/user/UserRepository';
 import { UserEntity } from '@identity/domain/user/UserEntity';
-import { InvalidRefreshTokenError } from '@identity/domain/auth/erros/InvalidRefreshTokenError';
-import { InvalidSessionError } from '@identity/domain/auth/erros/InvalidSessionError';
+import { InvalidRefreshTokenError } from '@identity/domain/auth/errors/InvalidRefreshTokenError';
+import { InvalidSessionError } from '@identity/domain/auth/errors/InvalidSessionError';
 import { ID, ResultValue } from '@timeboxing/shared';
 
 // Mock ID.generate()

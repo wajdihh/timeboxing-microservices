@@ -7,7 +7,7 @@ import { PasswordHasherPort } from "./utils/PasswordHasherPort";
 import { LoginRequestDto } from "./dto/LoginRequestDto";
 import { AuthResponseDto } from "./dto/AuthResponseDto";
 import { UserEntity } from "@identity/domain/user/UserEntity";
-import { InvalidCredentialsError } from "@identity/domain/auth/erros/InvalidCredentialsError";
+import { InvalidCredentialsError } from "@identity/domain/auth/errors/InvalidCredentialsError";
 
 @SwaggerUseCaseMetadata({
     errors: [InvalidEmailError, InvalidCredentialsError],

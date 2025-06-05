@@ -7,7 +7,7 @@ import { StrategyType } from './StrategyType';
 import { RefreshTokenUseCase } from '@identity/application/auth/RefreshTokenUseCase';
 import { UserEntity } from '@identity/domain/user/UserEntity';
 import { RequestWithRefreshTokenValue } from './helpers/RequestWithRefreshTokenValue';
-import { InvalidRefreshTokenError } from '@identity/domain/auth/erros/InvalidRefreshTokenError';
+import { InvalidRefreshTokenError } from '@identity/domain/auth/errors/InvalidRefreshTokenError';
 
 @Injectable()
 export class RefreshStrategy extends PassportStrategy(Strategy, StrategyType.REFRESH) {

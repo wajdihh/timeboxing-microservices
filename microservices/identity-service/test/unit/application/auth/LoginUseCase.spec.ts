@@ -3,7 +3,7 @@ import { PasswordHasherPort } from "@identity/application/auth/utils/PasswordHas
 import { UserEntity } from "@identity/domain/user/UserEntity";
 import { UserRepository } from "@identity/domain/user/UserRepository";
 import { InvalidEmailError } from "@identity/domain/user/errors/InvalidEmailError";
-import { InvalidCredentialsError } from "@identity/domain/auth/erros/InvalidCredentialsError";
+import { InvalidCredentialsError } from "@identity/domain/auth/errors/InvalidCredentialsError";
 import { ResultValue } from "@timeboxing/shared";
 
 describe('LoginUseCase', () => {
