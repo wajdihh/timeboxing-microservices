@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common'; // Import forwardRef
 import { UserController } from './UserController';
 import { RegisterUserUseCase } from '@identity/application/user/RegisterUserUseCase';
 import { BcryptPasswordAdapter, PASSWORD_HASHER_PORT } from '../auth/tools/BcryptPasswordAdapter';
@@ -9,7 +9,7 @@ import { USER_REPOSITORY } from '@identity/domain/user/UserRepository';
 import { AuthModule } from '../auth/AuthModule';
 
 @Module({
-  imports: [PrismaModule, AuthModule],
+  imports: [PrismaModule, forwardRef(() => AuthModule)], // Use forwardRef here
   controllers: [UserController],
   providers: [
     { provide: USER_REPOSITORY, useClass: PrismaUserRepository },
@@ -26,5 +26,6 @@ import { AuthModule } from '../auth/AuthModule';
       inject: [USER_REPOSITORY],
     },
   ],
+  exports: [RegisterUserUseCase], 
 })
 export class UserModule {}

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common'; // Import forwardRef
 import { JwtModule } from '@nestjs/jwt';
 import { PrismaModule } from '../prisma/PrismaModule';
 import { PrismaUserRepository } from '../user/PrismaUserRepository';
@@ -18,13 +18,15 @@ import { RefreshStrategy } from './strategies/RefreshStrategy';
 import { RefreshTokenUseCase } from '@identity/application/auth/RefreshTokenUseCase';
 import { LogoutUseCase } from '@identity/application/auth/LogoutUseCase';
 import { RedisIntegrationModule } from '../redis/RedisIntegrationModule';
+import { UserModule } from '../user/UserModule';
 
 @Module({
   imports: [
     PrismaModule,
     RedisIntegrationModule,
     AppConfigModule,
-    JwtModule.registerAsync({
+        forwardRef(() => UserModule), 
+        JwtModule.registerAsync({
       imports: [AppConfigModule],
       inject: [JwtConfigService], 
       useFactory: JwtOptionsFactory,

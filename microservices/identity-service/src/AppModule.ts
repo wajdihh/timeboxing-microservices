@@ -1,13 +1,34 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core'; // Re-add APP_GUARD
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler'; // Re-add ThrottlerGuard
 import { MetricsModule } from '@identity/infrastructure/observability/MetricsModule';
 import { UserModule } from '@identity/infrastructure/user/UserModule';
 import { AuthModule } from './infrastructure/auth/AuthModule';
 import { PrismaModule } from './infrastructure/prisma/PrismaModule';
 import { AppConfigModule } from './config/AppConfigModule';
 @Module({
-  imports: [AppConfigModule, MetricsModule, UserModule, AuthModule, PrismaModule],
+  imports: [
+    AppConfigModule,
+    MetricsModule,
+    UserModule,
+    AuthModule,
+    PrismaModule,
+    ThrottlerModule.forRoot([ // Single default configuration
+      {
+        ttl: 60000, 
+        limit: 10, // Default limit for all routes unless overridden
+      },
+    ]),
+  ],
+  providers: [
+    { // Re-instate ThrottlerGuard as a global guard
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class AppModule implements NestModule {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   configure(consumer: MiddlewareConsumer) {
     //TODO consumer.apply(CorrelationIdMiddleware).forRoutes('*path');
   }
