@@ -20,7 +20,6 @@ export class UserFactory {
       updatedAt: faker.date.recent(),
     };
   }
-  //TODO to delete after tests
   static wajdi() {
     return {
       name: 'Wajdi',

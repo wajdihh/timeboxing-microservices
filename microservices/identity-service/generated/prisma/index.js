@@ -168,7 +168,6 @@ const config = {
 }
 
 const fs = require('fs')
-// //TODO changed to b?schema=e2e" ? but i should also have public ? 
 config.dirname = __dirname
 if (!fs.existsSync(path.join(__dirname, 'schema.prisma'))) {
   const alternativePaths = [
