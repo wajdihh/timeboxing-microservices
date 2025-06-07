@@ -29,4 +29,8 @@ export class PrismaUserRepository implements UserRepository {
         const userEntity = UserPrismaMapper.toEntity(user);
         return ResultValue.ok(userEntity);
     }
+
+    async delete(id: ID): Promise<void> {
+        await this.prismaService.user.delete({ where: { id: id.value } });
+    }
 }

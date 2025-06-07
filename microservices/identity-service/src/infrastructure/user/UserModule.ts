@@ -7,6 +7,8 @@ import { PrismaUserRepository } from './PrismaUserRepository';
 import { PrismaModule } from '../prisma/PrismaModule';
 import { USER_REPOSITORY } from '@identity/domain/user/UserRepository';
 import { AuthModule } from '../auth/AuthModule';
+import { DeleteUserUseCase } from '@identity/application/user/DeleteUserUseCase';
+import { TOKEN_REPOSITORY } from '@identity/domain/auth/TokenRepository';
 
 @Module({
   imports: [PrismaModule, forwardRef(() => AuthModule)], // Use forwardRef here
@@ -24,6 +26,11 @@ import { AuthModule } from '../auth/AuthModule';
       provide: GetUserUseCase,
       useFactory: (repo) => new GetUserUseCase(repo),
       inject: [USER_REPOSITORY],
+    },
+    {
+      provide: DeleteUserUseCase,
+      useFactory: (repo, tokenRepo) => new DeleteUserUseCase(repo, tokenRepo),
+      inject: [USER_REPOSITORY, TOKEN_REPOSITORY],
     },
   ],
   exports: [RegisterUserUseCase], 
