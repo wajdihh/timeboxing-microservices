@@ -54,7 +54,7 @@ module.exports = {
     //Ignore Tests for Filenames Rule
     overrides: [
       {
-        files: ['**/main.ts','**/index.ts','**/.eslintrc.js', '**/*.spec.ts', '**/*.e2e-spec.ts', '**/test/**'],
+        files: ['**/main.ts','**/index.ts','**/.eslintrc.js', '**/*.spec.ts', '**/*.e2e-spec.ts', '**/test/**', '**/jest.config.js'],
         rules: {
           'filenames/match-regex': 'off',
           'filenames/match-exported': 'off'
