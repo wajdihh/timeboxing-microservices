@@ -38,6 +38,9 @@ describe('AuthController (e2e) - /auth/register', () => {
     expect(response.body).toHaveProperty('id');
     expect(response.body.email).toBe(registerDto.email);
     expect(response.body.name).toBe(registerDto.name);
+    // Check for x-correlation-id header
+    expect(response.headers['x-correlation-id']).toBeDefined();
+    expect(typeof response.headers['x-correlation-id']).toBe('string');
   });
 
   it('POST /auth/register - should throttle requests after exceeding the limit', async () => {
