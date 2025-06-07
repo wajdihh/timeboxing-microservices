@@ -6,9 +6,12 @@ import { UserModule } from '@identity/infrastructure/user/UserModule';
 import { AuthModule } from './infrastructure/auth/AuthModule';
 import { PrismaModule } from './infrastructure/prisma/PrismaModule';
 import { AppConfigModule } from './config/AppConfigModule';
+import { CorrelationIdMiddleware, LoggerModule } from '@timeboxing/shared/logger';
+
 @Module({
   imports: [
     AppConfigModule,
+    LoggerModule.forRootAsync(),
     MetricsModule,
     UserModule,
     AuthModule,
@@ -28,8 +31,7 @@ import { AppConfigModule } from './config/AppConfigModule';
   ],
 })
 export class AppModule implements NestModule {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   configure(consumer: MiddlewareConsumer) {
-    //TODO consumer.apply(CorrelationIdMiddleware).forRoutes('*path');
+    consumer.apply(CorrelationIdMiddleware).forRoutes('*');
   }
 }
