@@ -10,7 +10,7 @@ export class RegisterUserRequestDto {
 
   @Expose()
   @IsEmail()
-  @Transform(({ value }) => value.trim().toLowerCase())
+  @Transform(({ value }) => (value ? value.trim().toLowerCase() : value))
   email!: string;
 
   @Expose()

@@ -55,7 +55,7 @@ describe('DeleteUserUseCase', () => {
   it('should delete user and revoke tokens', async () => {
     const id = '123';
     const idValue = { value: id, equals: (other?: ID) => other?.value === id } as ID;
-    (ID.from as jest.Mock).mockReturnValue(ResultValue.ok(idValue));
+    (ID.from as jest.Mock).mockReturnValueOnce(ResultValue.ok(idValue));
     mockUserRepository.findByID.mockResolvedValue(ResultValue.ok(userEntity));
     mockUserRepository.delete.mockResolvedValue();
 
@@ -70,7 +70,7 @@ describe('DeleteUserUseCase', () => {
   it('should return UserNotFoundError if user does not exist', async () => {
     const id = 'not-exist';
     const idValue = { value: id, equals: (other?: ID) => other?.value === id } as ID;
-    (ID.from as jest.Mock).mockReturnValue(ResultValue.ok(idValue));
+    (ID.from as jest.Mock).mockReturnValueOnce(ResultValue.ok(idValue));
     mockUserRepository.findByID.mockResolvedValue(ResultValue.ok(null));
 
     const result = await useCase.execute(id);
@@ -81,14 +81,16 @@ describe('DeleteUserUseCase', () => {
 
   it('should return InvalidIDError if id is invalid', async () => {
     const result = await useCase.execute('invalid-id');
+
     expect(result.isOk).toBe(false);
     expect(result.error).toBeInstanceOf(InvalidIDError);
+    expect(mockUserRepository.findByID).not.toHaveBeenCalled();
   });
 
   it('should return repository error if findByID fails', async () => {
     const id = '123';
     const idValue = { value: id, equals: (other?: ID) => other?.value === id } as ID;
-    (ID.from as jest.Mock).mockReturnValue(ResultValue.ok(idValue));
+    (ID.from as jest.Mock).mockReturnValueOnce(ResultValue.ok(idValue));
     const repoError = new Error('db');
     mockUserRepository.findByID.mockResolvedValue(ResultValue.error(repoError));
 
@@ -101,7 +103,7 @@ describe('DeleteUserUseCase', () => {
   it('should throw if delete fails', async () => {
     const id = '123';
     const idValue = { value: id, equals: (other?: ID) => other?.value === id } as ID;
-    (ID.from as jest.Mock).mockReturnValue(ResultValue.ok(idValue));
+    (ID.from as jest.Mock).mockReturnValueOnce(ResultValue.ok(idValue));
     mockUserRepository.findByID.mockResolvedValue(ResultValue.ok(userEntity));
     const repoError = new Error('db');
     mockUserRepository.delete.mockRejectedValue(repoError);

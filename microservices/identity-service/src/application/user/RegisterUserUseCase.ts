@@ -32,7 +32,7 @@ export class RegisterUserUseCase {
         const hashedPassword = await this.passwordHashPort.hash(dto.password);
         const existingUser = await this.userRepository.findByEmail(emailValue);
 
-        if (!existingUser.isOk) return ResultValue.error(existingUser.error);
+        if (existingUser.isFail) return ResultValue.error(existingUser.error);
         if (existingUser.isOk && existingUser.unwrap()) return ResultValue.error(new UserAlreadyExistsError(dto.email));
 
         const user = UserMapper.toDomain(dto, hashedPassword).unwrap();
