@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Query, Req } from '@nestjs/common';
+import { Controller, Post, Body, Get, Query, Req, Delete } from '@nestjs/common';
 import { RegisterUserRequestDto } from '@identity/application/user/dto/RegisterUserRequestDto';
 import { RegisterUserUseCase } from '@identity/application/user/RegisterUserUseCase';
 import { SwaggerUseCase } from '@timeboxing/shared';
@@ -9,13 +9,15 @@ import { AuthResponseDto } from '@identity/application/auth/dto/AuthResponseDto'
 import { RequestWithUser } from '../auth/strategies/helpers/RequestWithUserValue';
 import { UserMapper } from '@identity/application/user/dto/UserMapper';
 import { ProtectByAuthGuard } from '../auth/strategies/helpers/JwtProtectByAuthGuardDecorator';
+import { DeleteUserUseCase } from '@identity/application/user/DeleteUserUseCase';
 
 @Controller('user')
 export class UserController {
 
   constructor(private readonly registerUserUseCase: RegisterUserUseCase,
     private readonly generateTokensForUserService: GenerateAuthTokensService,
-    private readonly getUserUseCase: GetUserUseCase) {}
+    private readonly getUserUseCase: GetUserUseCase,
+    private readonly deleteUserUseCase: DeleteUserUseCase) {}
 
   @SwaggerUseCase(RegisterUserUseCase)
   @Post()
@@ -34,8 +36,17 @@ export class UserController {
 
   @ProtectByAuthGuard()
   @Get('me')
-  @SwaggerUseCase(GetUserUseCase) 
+  @SwaggerUseCase(GetUserUseCase)
   async getCurrentUser(@Req() req: RequestWithUser): Promise<UserResponseDto> {
     return UserMapper.toResponse(req.user);
+  }
+
+  @ProtectByAuthGuard()
+  @Delete('me')
+  @SwaggerUseCase(DeleteUserUseCase)
+  async deleteCurrentUser(@Req() req: RequestWithUser): Promise<void> {
+    const id = req.user.id.value;
+    const result = await this.deleteUserUseCase.execute(id);
+    result.unwrap();
   }
 }

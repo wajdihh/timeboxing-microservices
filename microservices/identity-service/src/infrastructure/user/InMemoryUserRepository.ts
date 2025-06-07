@@ -22,10 +22,13 @@ export class InMemoryUserRepository implements UserRepository {
         return Promise.resolve();
     }
 
-    findByID(id: ID): Promise<ResultValue<UserEntity | null>> {
-        throw new Error('Method not implemented.');
+    async findByID(id: ID): Promise<ResultValue<UserEntity | null>> {
+        const user = this.users.find(u => u.id.equals(id));
+        return ResultValue.ok(user ?? null);
     }
 
+    async delete(id: ID): Promise<void> {
+        this.users = this.users.filter(u => !u.id.equals(id));
+    }
 
-    //TODO: To replace by mock and see if it's relavant to keep it
 }
