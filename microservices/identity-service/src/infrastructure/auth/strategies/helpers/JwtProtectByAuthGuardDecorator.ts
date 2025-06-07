@@ -3,7 +3,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { StrategyType } from '../StrategyType';
 import { UserEntity } from '@identity/domain/user/UserEntity';
 import { ApiBearerAuth } from '@nestjs/swagger';
-import { PassportUnauthorizedException } from '@identity/infrastructure/exceptions/PassportUnauthorizedException';
+import { InvalidAccessTokenError } from '@identity/domain/auth/errors/InvalidAccessTokenError';
 
 
 export function ProtectByAuthGuard(): MethodDecorator & ClassDecorator {
@@ -29,7 +29,7 @@ export class JwtAuthGuard extends AuthGuard(StrategyType.JWT) {
 
 
     if (err || !user || !(user instanceof UserEntity)) {
-      throw new PassportUnauthorizedException();
+      throw new InvalidAccessTokenError();
     }
 
     return user as TUser;

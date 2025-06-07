@@ -4,6 +4,7 @@ import { Test } from '@nestjs/testing';
 import { createTestUserAndTokens } from './helpers/TestAuthUtil';
 import { AppModule } from '@identity/AppModule';
 import { RefreshStrategy } from '@identity/infrastructure/auth/strategies/RefreshStrategy';
+import { InvalidRefreshTokenError } from '@identity/domain/auth/errors/InvalidRefreshTokenError';
 
 jest.setTimeout(60000);
 
@@ -26,7 +27,7 @@ describe('AuthController (e2e) - /auth/logout', () => {
   it('should return 401 if x-refresh-token header is missing', async () => {
     const res = await request(app.getHttpServer()).post('/auth/refresh');
     expect(res.status).toBe(401);
-    expect(res.body.error).toBe('InvalidRefreshTokenError');
+    expect(res.body.error).toBe(InvalidRefreshTokenError.name);
   });
 
   it('should return 401 if refresh token is malformed', async () => {
@@ -34,7 +35,7 @@ describe('AuthController (e2e) - /auth/logout', () => {
       .post('/auth/logout')
       .set(RefreshStrategy.headerKey, 'invalid.token.value')
     expect(res.status).toBe(401);
-    expect(res.body.error).toBe('InvalidRefreshTokenError');
+    expect(res.body.error).toBe(InvalidRefreshTokenError.name);
   });
 
   it('should return 401 if refresh token is unvalid', async () => {
@@ -44,6 +45,6 @@ describe('AuthController (e2e) - /auth/logout', () => {
       .post('/auth/logout')
       .set(RefreshStrategy.headerKey, tokens.refreshToken + '1')
     expect(res.status).toBe(401);
-    expect(res.body.error).toBe('InvalidRefreshTokenError');
+    expect(res.body.error).toBe(InvalidRefreshTokenError.name);
   });
 });
