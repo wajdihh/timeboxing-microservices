@@ -3,6 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { AppModule } from '../../../src/AppModule'; 
 import { UserFactory } from '@timeboxing/shared';
+import { InvalidCredentialsError } from '@identity/domain/auth/errors/InvalidCredentialsError';
 
 describe('AuthController (e2e) - /auth/login', () => {
   let app: INestApplication;
@@ -49,7 +50,7 @@ describe('AuthController (e2e) - /auth/login', () => {
 
     // Assert
     expect(response.status).toBe(401); 
-    expect(response.body.error).toBe('InvalidCredentialsError');
+    expect(response.body.error).toBe(InvalidCredentialsError.name);
     expect(response.body).not.toHaveProperty('accessToken');
     expect(response.body).not.toHaveProperty('refreshToken');
   });
@@ -66,7 +67,7 @@ describe('AuthController (e2e) - /auth/login', () => {
 
     // Assert
     expect(response.status).toBe(401); 
-    expect(response.body.error).toBe('InvalidCredentialsError');
+    expect(response.body.error).toBe(InvalidCredentialsError.name);
     expect(response.body).not.toHaveProperty('accessToken');
     expect(response.body).not.toHaveProperty('refreshToken');
   });

@@ -5,6 +5,7 @@ import { createTestUserAndTokens } from './helpers/TestAuthUtil';
 import { AppModule } from '@identity/AppModule';
 import { RefreshStrategy } from '@identity/infrastructure/auth/strategies/RefreshStrategy';
 import { UserFactory } from '@timeboxing/shared';
+import { InvalidRefreshTokenError } from '@identity/domain/auth/errors/InvalidRefreshTokenError';
 
 jest.setTimeout(60000);
 
@@ -27,7 +28,7 @@ describe('AuthController (e2e) - /auth/refresh', () => {
   it('should return 401 if x-refresh-token header is missing', async () => {
     const res = await request(app.getHttpServer()).post('/auth/refresh');
     expect(res.status).toBe(401);
-    expect(res.body.error).toBe('InvalidRefreshTokenError');
+    expect(res.body.error).toBe(InvalidRefreshTokenError.name);
   });
 
   it('should return 401 if refresh token is malformed', async () => {
@@ -35,7 +36,7 @@ describe('AuthController (e2e) - /auth/refresh', () => {
       .post('/auth/refresh')
       .set(RefreshStrategy.headerKey, 'invalid.token.value');
     expect(res.status).toBe(401);
-    expect(res.body.error).toBe('InvalidRefreshTokenError');
+    expect(res.body.error).toBe(InvalidRefreshTokenError.name);
   });
 
   it('should return new access token for valid refresh token', async () => {
@@ -57,7 +58,7 @@ describe('AuthController (e2e) - /auth/refresh', () => {
       .post('/auth/refresh')
       .set(RefreshStrategy.headerKey, tamperedToken);
     expect(res.status).toBe(401);
-    expect(res.body.error).toBe('InvalidRefreshTokenError');
+    expect(res.body.error).toBe(InvalidRefreshTokenError.name);
   });
 });
 
