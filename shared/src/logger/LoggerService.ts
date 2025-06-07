@@ -15,10 +15,6 @@ export class LoggerService implements NestLoggerService {
 
   constructor(
     // We can't inject ConfigService directly here if LoggerService is used by ConfigService itself (circular dep)
-    // or if it's used very early in bootstrap.
-    // A common pattern is to pass serviceName via a factory or a static method if needed globally early.
-    // For now, let's assume it can be configured or defaulted.
-    // Or, it could be provided by a dynamic module.
     private readonly configService?: ConfigService, // Optional for now
   ) {
     this.serviceName = this.configService?.get<string>('SERVICE_NAME') || 'unknown-service';
@@ -47,14 +43,11 @@ export class LoggerService implements NestLoggerService {
             })
           )
         }),
-        // In production, you might want to remove the console transport or have a JSON console transport
-        // and add a file transport or a transport for a log management system.
-        // new winston.transports.File({ filename: 'error.log', level: 'error' }),
-        // new winston.transports.File({ filename: 'combined.log' }),
       ],
     });
 
     // For production, ensure JSON logging to console if that's the target
+    // and add file transports.
     if (process.env.NODE_ENV === 'production') {
       this.logger.transports.forEach(t => {
         if (t instanceof winston.transports.Console) {
@@ -64,6 +57,21 @@ export class LoggerService implements NestLoggerService {
           );
         }
       });
+      this.logger.add(new winston.transports.File({ 
+        filename: 'logs/error.log', 
+        level: 'error',
+        format: winston.format.combine(
+          winston.format.timestamp(),
+          winston.format.json(),
+        ),
+      }));
+      this.logger.add(new winston.transports.File({ 
+        filename: 'logs/combined.log',
+        format: winston.format.combine(
+          winston.format.timestamp(),
+          winston.format.json(),
+        ),
+      }));
     }
   }
 

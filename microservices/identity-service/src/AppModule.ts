@@ -6,7 +6,7 @@ import { UserModule } from '@identity/infrastructure/user/UserModule';
 import { AuthModule } from './infrastructure/auth/AuthModule';
 import { PrismaModule } from './infrastructure/prisma/PrismaModule';
 import { AppConfigModule } from './config/AppConfigModule';
-import { CorrelationIdMiddleware, LoggerModule } from '@timeboxing/shared/logger';
+import { CorrelationIdMiddleware, LoggerModule } from '@timeboxing/shared';
 
 @Module({
   imports: [
