@@ -64,8 +64,6 @@ export class TokenRepositoryAdapter implements TokenRepository {
       const sessionId = payload.jti;
       const isSessionValide = await this.isRefreshTokenHasActiveSession(userId, sessionId);
 
-      console.log('isSessionValide', isSessionValide);
-
       if (!isSessionValide) {
         return ResultValue.error(new InvalidSessionError());
       }
@@ -121,7 +119,6 @@ export class TokenRepositoryAdapter implements TokenRepository {
   private async saveSessionId(userId: string, sessionId: string): Promise<void> {
      const sessionKey = RedisKeys.sessionKey(sessionId);
      const userSessionsKey = RedisKeys.userSessionsKey(userId);
-     console.log('User sessions key', userSessionsKey, 'Session Id key', sessionKey);
      await this.redisService.pushToList(userSessionsKey, sessionKey);
     return;
   }

@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { MetricsController } from '@identity/infrastructure/observability/MetricsController';
 import { CollectMetricsUseCase } from '@identity/application/observability/CollectMetricsUseCase';
-import { PrometheusMetricsAdapter } from '@identity/infrastructure/observability/PrometheusMetricsAdapter';
+import { MetricsController } from './MetricsController';
+import { PrometheusMetricsAdapter } from './PrometheusMetricsAdapter';
 
 @Module({
   controllers: [MetricsController],

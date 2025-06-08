@@ -4,20 +4,17 @@ import {
     ArgumentsHost,
     HttpException,
     HttpStatus,
-    Inject,
   } from '@nestjs/common';
   import { Response } from 'express';
   import { BaseDomainError } from './BaseDomainError';
-  import { LoggerService } from '../logger/LoggerService'; // Assuming LoggerService is in a 'logger' subdir
 
   @Catch()
   export class GlobalExceptionFilter implements ExceptionFilter {
-    constructor(@Inject(LoggerService) private readonly logger: LoggerService) {}
-
+    constructor() {} 
     catch(exception: unknown, host: ArgumentsHost) {
       const ctx = host.switchToHttp();
       const response = ctx.getResponse<Response>();
-      const request = ctx.getRequest(); // Get request for more log context
+      const request = ctx.getRequest();
 
       let status: HttpStatus;
       let message: string;
@@ -35,17 +32,8 @@ import {
           message: message,
           error: errorName,
         };
-        this.logger.warn(
-          { 
-            message: `Domain Error: ${message}`, 
-            errorName, 
-            path: request.url, 
-            method: request.method,
-            exceptionStack: exception.stack,
-          }, 
-          GlobalExceptionFilter.name
-        );
-      }
+        console.warn(`[GlobalExceptionFilter] Domain Error: ${message}. Name: ${errorName}. Path: ${request.url}. Method: ${request.method}. Stack: ${exception instanceof Error ? exception.stack : 'N/A'}`);
+              }
       //NestJS exception
       else if (exception instanceof HttpException) {
         status = exception.getStatus();
@@ -64,37 +52,29 @@ import {
           }
         }
         errorName = exception.constructor.name;
-        this.logger.warn(
-          { 
-            message: `HTTP Exception: ${message}`, 
-            errorName, 
-            path: request.url, 
-            method: request.method,
-            responseBody,
-            exceptionStack: exception.stack,
-          }, 
-          GlobalExceptionFilter.name
-        );
-      }
+        console.warn(`[GlobalExceptionFilter] HTTP Exception: ${message}. Name: ${errorName}. Path: ${request.url}. Method: ${request.method}. Stack: ${exception instanceof Error ? exception.stack : 'N/A'}`);
+              }
       // Unhandled exception
       else {
+        console.error(`[GlobalExceptionFilter] Entering unhandled exception block. Exception type: ${typeof exception}. Stringified: ${String(exception)}`);
+
         status = HttpStatus.INTERNAL_SERVER_ERROR;
         message = 'Internal server error';
-        errorName = (exception as Error)?.name || 'UnknownError';
+        
+        const err = exception instanceof Error ? exception : null;
+        errorName = err?.name || 'UnknownError';
+        const exceptionMessage = err?.message || String(exception);
+        const exceptionStack = err?.stack;
+
         responseBody = {
           statusCode: status,
-          message: message,
+          message: message, 
+          error: errorName, 
+          detail: exceptionMessage, 
         };
-        this.logger.error(
-          { 
-            message: `Unhandled Exception: ${(exception as Error)?.message || String(exception)}`, 
-            errorName, 
-            path: request.url, 
-            method: request.method,
-            exceptionStack: (exception as Error)?.stack,
-          },
-          (exception as Error)?.stack, 
-          GlobalExceptionFilter.name
+        console.error(
+          `[GlobalExceptionFilter] Unhandled Exception: ${exceptionMessage}. Name: ${errorName}. Path: ${request.url}. Method: ${request.method}.`,
+          exceptionStack
         );
       }
   

@@ -79,4 +79,7 @@ export class RedisService {
     await this.redisClient.lrem(listKey, 0, value); // 0 delete all occurences
   }
 
+  async ping(): Promise<string> {
+    return this.redisClient.ping();
+  }
 }

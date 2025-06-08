@@ -30,7 +30,7 @@ async function bootstrap() {
   });
   const port = process.env.PORT ?? 3000;
   //Catch Exceptions from domain layer or application layer
-  app.useGlobalFilters(new GlobalExceptionFilter());
+  // app.useGlobalFilters(app.get(GlobalExceptionFilter)); // Temporarily comment out
   // Enable validation pipe -> This will automatically validate incoming requests based on the DTOs
   app.useGlobalPipes(new ValidationPipe({
     transform: true,
@@ -40,4 +40,22 @@ async function bootstrap() {
   await app.listen(port);
 
 }
-bootstrap();
+bootstrap().catch(err => {
+  // Fallback logger if NestJS logger isn't available or error is too early
+  console.error('FATAL ERROR during bootstrap:');
+  if (err instanceof Error) {
+    console.error('Error Name:', err.name);
+    console.error('Error Message:', err.message);
+    console.error('Error Stack:', err.stack);
+  } else {
+    // If it's not an Error instance, try to inspect it
+    console.error('Raw error object:', err);
+    try {
+      console.error('Stringified error:', String(err));
+      console.error('JSON.stringified error:', JSON.stringify(err));
+    } catch (e) {
+      console.error('Could not stringify or JSON.stringify the error object.');
+    }
+  }
+  process.exit(1);
+});

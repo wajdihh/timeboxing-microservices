@@ -1,7 +1,7 @@
 import { DynamicModule, Global, Module, Provider } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { LoggerService } from './LoggerService';
-
+import { GlobalExceptionFilter } from '../errors/GlobalExceptionFilter'; // Restore import
 export const LOGGER_SERVICE_NAME_TOKEN = 'LOGGER_SERVICE_NAME';
 
 export interface LoggerModuleOptions {
@@ -40,8 +40,8 @@ export class LoggerModule {
     
     return {
       module: LoggerModule,
-      providers: [serviceNameProvider, loggerServiceProvider],
-      exports: [LoggerService],
+      providers: [serviceNameProvider, loggerServiceProvider, GlobalExceptionFilter], // Restore GlobalExceptionFilter
+      exports: [LoggerService, GlobalExceptionFilter], // Restore GlobalExceptionFilter
     };
   }
 
@@ -57,8 +57,8 @@ export class LoggerModule {
     };
     return {
         module: LoggerModule,
-        providers: [loggerServiceProvider],
-        exports: [LoggerService],
+        providers: [loggerServiceProvider, GlobalExceptionFilter], // Restore GlobalExceptionFilter
+        exports: [LoggerService, GlobalExceptionFilter], // Restore GlobalExceptionFilter
     };
   }
 }
