@@ -1,4 +1,4 @@
-# ✅ ADR-006: Observability Strategy (Metrics, Logs, Tracing)
+# ✅ ADR-008: Observability Strategy (Metrics, Logs, Tracing)
 
 ## 🎯 Decision
 

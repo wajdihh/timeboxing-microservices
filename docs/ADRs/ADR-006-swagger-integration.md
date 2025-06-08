@@ -1,4 +1,4 @@
-# ADR-006: Swagger Integration via Use Case Metadata
+# ✅ ADR-006: Swagger Integration via Use Case Metadata
 
 ## Context
 

@@ -1,7 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './AppModule';
 import { LoggerService, LoggingInterceptor, setupSwagger } from '@timeboxing/shared'; // Corrected import, Added LoggingInterceptor
-import { GlobalExceptionFilter } from '@timeboxing/shared';
 import { ValidationPipe } from '@nestjs/common';
 // LoggerService already imported from @timeboxing/shared
 
@@ -53,6 +52,7 @@ bootstrap().catch(err => {
     try {
       console.error('Stringified error:', String(err));
       console.error('JSON.stringified error:', JSON.stringify(err));
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e) {
       console.error('Could not stringify or JSON.stringify the error object.');
     }

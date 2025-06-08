@@ -1,16 +1,16 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Registry, collectDefaultMetrics, Counter, Histogram } from 'prom-client';
 import { MetricsPort } from '@identity/application/observability/MetricsPort';
+import { LoggerService } from '@timeboxing/shared';
 
 @Injectable()
 export class PrometheusMetricsAdapter implements MetricsPort {
-  private readonly logger = new Logger(PrometheusMetricsAdapter.name);
   public readonly register: Registry;
   private readonly requestCounter: Counter<string>;
   private readonly errorCounter: Counter<string>;
   private readonly requestDuration: Histogram<string>;
 
-  constructor() {
+  constructor(private readonly myLogger: LoggerService) {
     this.register = new Registry();
     collectDefaultMetrics({ register: this.register });
 
@@ -31,7 +31,7 @@ export class PrometheusMetricsAdapter implements MetricsPort {
     this.requestDuration = new Histogram({
       name: 'http_request_duration_seconds',
       help: 'Duration of HTTP requests in seconds',
-      labelNames: ['method', 'route'],
+      labelNames: ['method', 'route', 'status'],
       registers: [this.register],
     });
   }
@@ -41,7 +41,16 @@ export class PrometheusMetricsAdapter implements MetricsPort {
       return await this.register.metrics();
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.stack : String(error);
-      this.logger.error('Failed to collect metrics', errorMessage);
+            this.myLogger.error({
+        message: 'Database readiness check failed',
+        useCase: 'checkReadiness',
+        error: errorMessage,
+      });
+      this.myLogger.error({
+        message: 'Failed to collect metrics',
+        useCase: 'collectMetrics',
+        error: errorMessage,
+      });
       throw new Error('Failed to collect metrics');
     }
   }
@@ -54,7 +63,7 @@ export class PrometheusMetricsAdapter implements MetricsPort {
     this.errorCounter.labels(method, route, status).inc();
   }
 
-  startRequestTimer(method: string, route: string) {
-    return this.requestDuration.labels(method, route).startTimer();
+  startRequestTimer(method: string, route: string, status: string) {
+    return this.requestDuration.labels(method, route, status).startTimer();
   }
 }

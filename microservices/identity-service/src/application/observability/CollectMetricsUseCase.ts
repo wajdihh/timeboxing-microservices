@@ -9,8 +9,8 @@ export class CollectMetricsUseCase {
     return this.metricsPort.getMetrics();
   }
 
-  startRequestTimer(method: string, path: string): () => void {
-    return this.metricsPort.startRequestTimer(method, path);
+  startRequestTimer(method: string, path: string, status: string): () => void {
+    return this.metricsPort.startRequestTimer(method, path, status);
   }
 
 

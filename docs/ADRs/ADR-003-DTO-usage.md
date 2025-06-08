@@ -1,4 +1,4 @@
-# ADR-003: Data Transfer Objects (DTO) Usage
+# ✅ ADR-003: Data Transfer Objects (DTO) Usage
 
 ## Context
 Our microservices follow Hexagonal Architecture, clearly separating Domain, Application, and Infrastructure layers. To maintain this clarity and avoid tight coupling between layers, we need a standardized and explicit way to transfer data between these layers.

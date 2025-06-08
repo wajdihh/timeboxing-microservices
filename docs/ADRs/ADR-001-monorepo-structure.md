@@ -1,4 +1,4 @@
-# ADR 001: Monorepo Structure & Shared Packages
+# ✅ ADR 001: Monorepo Structure & Shared Packages
 
 ## Context
 We opted for a monorepo to streamline sharing common packages, reduce duplication, and enable easy versioning.

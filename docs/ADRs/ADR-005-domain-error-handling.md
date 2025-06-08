@@ -1,4 +1,4 @@
-# ADR-005: Domain Error Handling Strategy
+# ✅ ADR-005: Domain Error Handling Strategy
 
 ## Context
 

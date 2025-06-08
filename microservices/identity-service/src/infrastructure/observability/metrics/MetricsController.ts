@@ -8,7 +8,7 @@ export class MetricsController {
 
   @Get()
   async getMetrics(@Req() req: Request, @Res() res: Response): Promise<void> {
-    const timer = this.collectMetricsUseCase.startRequestTimer(req.method, req.path);
+    const timer = this.collectMetricsUseCase.startRequestTimer(req.method, req.path, res.statusCode.toString());
 
     try {
       const metrics = await this.collectMetricsUseCase.getMetrics();
