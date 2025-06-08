@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { AuthTokenType, ResultValue, SuccessStatus, SwaggerUseCaseMetadata } from "@timeboxing/shared";
 import { TokenRepository } from "@identity/domain/auth/TokenRepository";
 import { InvalidRefreshTokenError } from "@identity/domain/auth/errors/InvalidRefreshTokenError";
+import { MetricsPort } from "../observability/MetricsPort";
 
 @SwaggerUseCaseMetadata({
     errors: [InvalidRefreshTokenError],
@@ -11,7 +12,8 @@ import { InvalidRefreshTokenError } from "@identity/domain/auth/errors/InvalidRe
 
 @Injectable()
 export class LogoutUseCase {
-    constructor(private readonly tokenRepository: TokenRepository) { }
+    constructor(private readonly tokenRepository: TokenRepository, 
+        private readonly metricsPort: MetricsPort) { }
 
     async execute(refreshToken: string): Promise<ResultValue<void, InvalidRefreshTokenError>> {
         const verifyResult = await this.tokenRepository.verifyRefreshToken(refreshToken);
@@ -21,6 +23,9 @@ export class LogoutUseCase {
         const sessionId = verify.sessionID;
         const result = await this.tokenRepository.revokeRefreshToken(userId, sessionId);
         if (ResultValue.isFail(result)) return ResultValue.error(new InvalidRefreshTokenError());
+
+        this.metricsPort.incrementLogout('POST');
+
         return ResultValue.ok();
     }
 }

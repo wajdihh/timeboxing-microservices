@@ -9,6 +9,7 @@ import { USER_REPOSITORY } from '@identity/domain/user/UserRepository';
 import { AuthModule } from '../auth/AuthModule';
 import { DeleteUserUseCase } from '@identity/application/user/DeleteUserUseCase';
 import { TOKEN_REPOSITORY } from '@identity/domain/auth/TokenRepository';
+import { PROMETHEUSE_METRICS_ADAPTER } from '../observability/metrics/PrometheusMetricsAdapter'; // PrometheusMetricsAdapter class import removed
 
 @Module({
   imports: [PrismaModule, forwardRef(() => AuthModule)], // Use forwardRef here
@@ -19,8 +20,8 @@ import { TOKEN_REPOSITORY } from '@identity/domain/auth/TokenRepository';
 
     {
       provide: RegisterUserUseCase,
-      useFactory: (repo, port) => new RegisterUserUseCase(repo, port),
-      inject: [USER_REPOSITORY, PASSWORD_HASHER_PORT],
+      useFactory: (repo, port, metrics) => new RegisterUserUseCase(repo, port, metrics),
+      inject: [USER_REPOSITORY, PASSWORD_HASHER_PORT, PROMETHEUSE_METRICS_ADAPTER],
     },
     {
       provide: GetUserUseCase,

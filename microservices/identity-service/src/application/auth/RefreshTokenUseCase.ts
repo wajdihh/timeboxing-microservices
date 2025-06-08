@@ -6,6 +6,7 @@ import { TokenRepository } from "@identity/domain/auth/TokenRepository";
 import { InvalidRefreshTokenError } from "@identity/domain/auth/errors/InvalidRefreshTokenError";
 import { UserEntity } from "@identity/domain/user/UserEntity";
 import { InvalidSessionError } from "@identity/domain/auth/errors/InvalidSessionError";
+import { MetricsPort } from "../observability/MetricsPort";
 
 @SwaggerUseCaseMetadata({
     errors: [InvalidRefreshTokenError, InvalidSessionError],
@@ -16,7 +17,9 @@ import { InvalidSessionError } from "@identity/domain/auth/errors/InvalidSession
 
 @Injectable()
 export class RefreshTokenUseCase {
-    constructor(private readonly userRepository: UserRepository, private readonly tokenRepository: TokenRepository) { }
+    constructor(private readonly userRepository: UserRepository,
+        private readonly tokenRepository: TokenRepository,
+        private readonly metricsPort: MetricsPort) { }
 
     async execute(refreshToken: string): Promise<ResultValue<UserEntity, InvalidRefreshTokenError | InvalidSessionError>> {
 
@@ -30,6 +33,9 @@ export class RefreshTokenUseCase {
 
         const userValue = userResult.unwrap();
         if (!userValue) return ResultValue.error(new InvalidRefreshTokenError())
+
+        this.metricsPort.incrementRefreshToken('POST');
+
         return ResultValue.ok(userValue);
     }
 }

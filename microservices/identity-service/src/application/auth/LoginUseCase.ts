@@ -8,6 +8,7 @@ import { LoginRequestDto } from "./dto/LoginRequestDto";
 import { AuthResponseDto } from "./dto/AuthResponseDto";
 import { UserEntity } from "@identity/domain/user/UserEntity";
 import { InvalidCredentialsError } from "@identity/domain/auth/errors/InvalidCredentialsError";
+import { MetricsPort } from "../observability/MetricsPort";
 
 @SwaggerUseCaseMetadata({
     errors: [InvalidEmailError, InvalidCredentialsError],
@@ -16,18 +17,12 @@ import { InvalidCredentialsError } from "@identity/domain/auth/errors/InvalidCre
     successStatus: SuccessStatus.CREATED,
 })
 
-/**
- * We GOT AN EXCEPTION FOR OUR DDD here 
- * Passport uses Stratgy to call useCase , and useCase should return entity and not EntityResponseDTO 
- * Then this stratgy is used directly by controller 
- * SO ONLY FOR passport 
- * Controller -> Stratgy -> UseCase
- */
 
 @Injectable()
 export class LoginUseCase {
     constructor(private readonly userRepository: UserRepository,
-        private readonly passwordHashPort: PasswordHasherPort) { }
+        private readonly passwordHashPort: PasswordHasherPort,
+        private readonly metricsPort: MetricsPort) { }
 
     async execute(dto: LoginRequestDto): Promise<ResultValue<UserEntity, InvalidCredentialsError | InvalidEmailError>> {
         const email = dto.email;
@@ -48,6 +43,8 @@ export class LoginUseCase {
         const isPasswordValid = await this.passwordHashPort.compare(password, userValue?.passwordHash || '');
         if (!userValue || !isPasswordValid) return ResultValue.error(new InvalidCredentialsError());
 
+        this.metricsPort.incrementLogin('POST');
+    
         return ResultValue.ok(userValue);
     }
 }

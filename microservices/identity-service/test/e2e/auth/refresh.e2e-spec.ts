@@ -48,6 +48,14 @@ describe('AuthController (e2e) - /auth/refresh', () => {
 
     expect(response.body).toHaveProperty('accessToken');
     expect(response.body.accessToken).not.toBe(tokens.accessToken);
+
+     // Act - fetch /metrics
+    const metricsRes = await request(app.getHttpServer())
+      .get('/metrics');
+
+    // Assert - metric incremented
+    expect(metricsRes.status).toBe(200);
+    expect(metricsRes.text).toContain('identity_refresh_tokens_total{method="POST"}');
   });
 
   it('should return 401 if refresh token signature is tampered', async () => {

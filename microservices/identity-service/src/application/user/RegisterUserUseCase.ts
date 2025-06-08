@@ -9,6 +9,7 @@ import { InvalidEmailError } from "@identity/domain/user/errors/InvalidEmailErro
 import { EmailValue } from "@identity/domain/user/value-objects/EmailValue";
 import { AuthResponseDto } from "../auth/dto/AuthResponseDto";
 import { UserEntity } from "@identity/domain/user/UserEntity";
+import { MetricsPort } from "../observability/MetricsPort";
 
 @SwaggerUseCaseMetadata({
     errors: [InvalidEmailError, UserAlreadyExistsError],
@@ -19,7 +20,9 @@ import { UserEntity } from "@identity/domain/user/UserEntity";
 @Injectable()
 export class RegisterUserUseCase {
 
-    constructor(private readonly userRepository: UserRepository, private readonly passwordHashPort: PasswordHasherPort) { }
+    constructor(private readonly userRepository: UserRepository,
+        private readonly passwordHashPort: PasswordHasherPort,
+        private readonly metricsPort: MetricsPort) { }
 
     async execute(dto: RegisterUserRequestDto): Promise<ResultValue<UserEntity, UserAlreadyExistsError | InvalidEmailError>> {
 
@@ -37,6 +40,9 @@ export class RegisterUserUseCase {
 
         const user = UserMapper.toDomain(dto, hashedPassword).unwrap();
         await this.userRepository.save(user);
+
+        this.metricsPort.incrementRegistration('POST');
+
         return ResultValue.ok(user);
 
     }
