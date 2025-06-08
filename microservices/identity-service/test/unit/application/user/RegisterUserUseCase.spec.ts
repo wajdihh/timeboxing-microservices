@@ -3,11 +3,12 @@ import { UserRepository } from '@identity/domain/user/UserRepository';
 import { PasswordHasherPort } from '@identity/application/auth/utils/PasswordHasherPort';
 import { UserEntity } from '@identity/domain/user/UserEntity';
 import { UserMapper } from '@identity/application/user/dto/UserMapper';
+import { MetricsPort } from '@identity/application/observability/MetricsPort';
 import { RegisterUserRequestDto } from '@identity/application/user/dto/RegisterUserRequestDto';
 import { UserAlreadyExistsError } from '@identity/domain/user/errors/UserAlreadyExistsError';
 import { InvalidEmailError } from '@identity/domain/user/errors/InvalidEmailError';
 import { EmailValue } from '@identity/domain/user/value-objects/EmailValue';
-import { ID, ResultValue } from '@timeboxing/shared';
+import { BaseDomainError, BaseInfraError, ID, ResultValue } from '@timeboxing/shared';
 
 // Mock UserMapper and EmailValue
 jest.mock('@identity/application/user/dto/UserMapper');
@@ -33,6 +34,7 @@ describe('RegisterUserUseCase', () => {
     let useCase: RegisterUserUseCase;
     let mockUserRepository: jest.Mocked<UserRepository>;
     let mockPasswordHasherPort: jest.Mocked<PasswordHasherPort>;
+    let mockMetricsPort: jest.Mocked<MetricsPort>;
     let mockUserEntity: UserEntity;
 
     const requestDto: RegisterUserRequestDto = {
@@ -53,6 +55,17 @@ describe('RegisterUserUseCase', () => {
             hash: jest.fn().mockResolvedValue(hashedPassword),
             compare: jest.fn(), // Added to satisfy PasswordHasherPort interface
         } as jest.Mocked<PasswordHasherPort>;
+
+        mockMetricsPort = {
+            incrementRegistration: jest.fn(),
+            incrementLogin: jest.fn(),
+            incrementLogout: jest.fn(),
+            incrementRefreshToken: jest.fn(),
+            getMetrics: jest.fn(),
+            startRequestTimer: jest.fn().mockReturnValue(jest.fn()),
+            incrementRequestCounter: jest.fn(),
+            incrementErrorCounter: jest.fn(),
+        } as jest.Mocked<MetricsPort>;
         
         const mockEmailValue = { value: requestDto.email } as EmailValue; // Consistent mock EmailValue
         mockUserEntity = {
@@ -68,7 +81,7 @@ describe('RegisterUserUseCase', () => {
         (EmailValue.create as jest.Mock).mockReturnValue(ResultValue.ok(mockEmailValue));
         (UserMapper.toDomain as jest.Mock).mockReturnValue(ResultValue.ok(mockUserEntity));
 
-        useCase = new RegisterUserUseCase(mockUserRepository, mockPasswordHasherPort);
+        useCase = new RegisterUserUseCase(mockUserRepository, mockPasswordHasherPort, mockMetricsPort);
     });
 
     afterEach(() => {
@@ -92,6 +105,7 @@ describe('RegisterUserUseCase', () => {
             expect(mockUserRepository.findByEmail).toHaveBeenCalledWith({ value: requestDto.email });
             expect(UserMapper.toDomain).toHaveBeenCalledWith(requestDto, hashedPassword);
             expect(mockUserRepository.save).toHaveBeenCalledWith(mockUserEntity);
+            expect(mockMetricsPort.incrementRegistration).toHaveBeenCalled();
         });
 
         it('should return InvalidEmailError if email is invalid', async () => {
@@ -127,7 +141,7 @@ describe('RegisterUserUseCase', () => {
 
         it('should return error from findByEmail if it fails', async () => {
             // Given
-            const repoError = new Error('Database error during findByEmail');
+            const repoError = new BaseInfraError('Database error during findByEmail');
             mockUserRepository.findByEmail.mockResolvedValue(ResultValue.error(repoError));
 
             // When
@@ -141,7 +155,7 @@ describe('RegisterUserUseCase', () => {
         it('should return error if UserMapper.toDomain fails', async () => {
             // Given
             mockUserRepository.findByEmail.mockResolvedValue(ResultValue.ok(null)); // No existing user
-            const mappingError = new Error('Mapping to domain failed');
+            const mappingError = new BaseDomainError('Mapping to domain failed');
             (UserMapper.toDomain as jest.Mock).mockReturnValue(ResultValue.error(mappingError));
             await expect(useCase.execute(requestDto)).rejects.toThrow(mappingError.message);
             expect(mockUserRepository.save).not.toHaveBeenCalled();
@@ -150,7 +164,7 @@ describe('RegisterUserUseCase', () => {
         it('should throw error if userRepository.save fails', async () => {
             // Given
             mockUserRepository.findByEmail.mockResolvedValue(ResultValue.ok(null)); // No existing user
-            const saveError = new Error('Database error during save');
+            const saveError = new BaseDomainError('Database error during save');
             mockUserRepository.save.mockRejectedValue(saveError); // save returns Promise<void>
 
             // When / Then

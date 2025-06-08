@@ -2,9 +2,10 @@ import { RefreshTokenUseCase } from '@identity/application/auth/RefreshTokenUseC
 import { TokenRepository } from '@identity/domain/auth/TokenRepository';
 import { UserRepository } from '@identity/domain/user/UserRepository';
 import { UserEntity } from '@identity/domain/user/UserEntity';
+import { MetricsPort } from '@identity/application/observability/MetricsPort';
 import { InvalidRefreshTokenError } from '@identity/domain/auth/errors/InvalidRefreshTokenError';
 import { InvalidSessionError } from '@identity/domain/auth/errors/InvalidSessionError';
-import { ID, ResultValue } from '@timeboxing/shared';
+import { ID, ResultValue, BaseInfraError } from '@timeboxing/shared';
 
 // Mock ID.generate()
 const mockGeneratedId = ID.fake();
@@ -25,6 +26,7 @@ describe('RefreshTokenUseCase', () => {
   let useCase: RefreshTokenUseCase;
   let mockUserRepo: jest.Mocked<UserRepository>;
   let mockTokenRepo: jest.Mocked<TokenRepository>;
+  let mockMetricsPort: jest.Mocked<MetricsPort>;
 
   beforeEach(() => {
     mockUserRepo = {
@@ -41,7 +43,18 @@ describe('RefreshTokenUseCase', () => {
       decodeAccessToken: jest.fn(),
     } as unknown as jest.Mocked<TokenRepository>;
 
-    useCase = new RefreshTokenUseCase(mockUserRepo, mockTokenRepo);
+    mockMetricsPort = {
+        incrementRegistration: jest.fn(),
+        incrementLogin: jest.fn(),
+        incrementLogout: jest.fn(),
+        incrementRefreshToken: jest.fn(),
+        getMetrics: jest.fn(),
+        startRequestTimer: jest.fn().mockReturnValue(jest.fn()),
+        incrementRequestCounter: jest.fn(),
+        incrementErrorCounter: jest.fn(),
+    } as jest.Mocked<MetricsPort>;
+
+    useCase = new RefreshTokenUseCase(mockUserRepo, mockTokenRepo, mockMetricsPort);
   });
 
   it('should return user entity for a valid refresh token and existing user', async () => {
@@ -66,6 +79,7 @@ describe('RefreshTokenUseCase', () => {
     expect(unwrappedUser?.id.equals(expectedUserId)).toBe(true);
     expect(mockTokenRepo.verifyRefreshToken).toHaveBeenCalledWith(refreshToken);
     expect(mockUserRepo.findByID).toHaveBeenCalledWith(expectedUserId);
+    expect(mockMetricsPort.incrementRefreshToken).toHaveBeenCalled();
   });
 
   it('should return error if token verification fails', async () => {
@@ -91,7 +105,7 @@ describe('RefreshTokenUseCase', () => {
       ResultValue.ok({ userId, sessionID: 'session-id' }),
     );
     // Simulate a failure in the repository layer for findByID
-    const repoError = new Error('Database error');
+    const repoError = new BaseInfraError('Database error');
     mockUserRepo.findByID.mockResolvedValue(ResultValue.error(repoError));
 
     // When

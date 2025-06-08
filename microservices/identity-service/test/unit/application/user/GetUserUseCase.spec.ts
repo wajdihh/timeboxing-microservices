@@ -4,7 +4,7 @@ import { UserEntity } from '@identity/domain/user/UserEntity';
 import { UserMapper } from '@identity/application/user/dto/UserMapper';
 import { UserResponseDto } from '@identity/application/user/dto/UserResponseDto';
 import { UserNotFoundError } from '@identity/domain/user/errors/UserNotFoundError';
-import { InvalidIDError, ID, ResultValue } from '@timeboxing/shared'; // Assuming this path is okay
+import { InvalidIDError, ID, ResultValue, BaseInfraError } from '@timeboxing/shared'; // Assuming this path is okay
 
 // Mock UserMapper
 jest.mock('@identity/application/user/dto/UserMapper');
@@ -127,7 +127,7 @@ describe('GetUserUseCase', () => {
       // Given
       const idValueForRepo = { value: mockIdString, equals: (other?: ID | undefined) => other?.value === mockIdString } as ID;
       (ID.from as jest.Mock).mockReturnValue(ResultValue.ok(idValueForRepo));
-      const repositoryError = new Error('Database connection error');
+      const repositoryError = new BaseInfraError('Database connection error');
       mockUserRepository.findByID.mockResolvedValue(ResultValue.error(repositoryError));
 
       // When

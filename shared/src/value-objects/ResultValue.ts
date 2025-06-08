@@ -1,4 +1,6 @@
-export class ResultValue<T, E extends Error = Error> {
+import { BaseError } from "../errors";
+
+export class ResultValue<T, E extends BaseError = BaseError> {
   private constructor(
     public readonly isOk: boolean,
     public readonly isFail: boolean,
@@ -15,24 +17,24 @@ export class ResultValue<T, E extends Error = Error> {
     return new ResultValue<T>(true, false, value);
   }
 
-  static error<E extends Error>(error: E): ResultValue<never, E> {
+  static error<E extends BaseError>(error: E): ResultValue<never, E> {
     return new ResultValue<never, E>(false, true, undefined, error);
   }
 
-  static isOk<T, E extends Error>(result: ResultValue<T, E>): result is ResultValue<T, E> {
+  static isOk<T, E extends BaseError>(result: ResultValue<T, E>): result is ResultValue<T, E> {
     return result.isOk;
   }
 
-  static isFail<T, E extends Error>(result: ResultValue<T, E>): result is ResultValue<never, E> {
+  static isFail<T, E extends BaseError>(result: ResultValue<T, E>): result is ResultValue<never, E> {
     return result.isFail;
   }
 
-  static returnValue<T, E extends Error>(result: ResultValue<T, E>): T {
+  static returnValue<T, E extends BaseError>(result: ResultValue<T, E>): T {
     if (result.isFail) throw result._error;
     return result._value as T;
   }
 
-  static returnError<T, E extends Error>(result: ResultValue<T, E>): E {
+  static returnError<T, E extends BaseError>(result: ResultValue<T, E>): E {
     if (result.isOk) throw new Error('Cannot extract error from a successful result');
     return result._error as E;
   }

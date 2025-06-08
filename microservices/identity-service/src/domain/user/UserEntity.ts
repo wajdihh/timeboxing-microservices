@@ -22,7 +22,7 @@ export class UserEntity {
     }
 
     //For restoring from persistence (e.g. Prisma)
-    static restore(props: { id: string; name: string; email: string; passwordHash: string; createdAt: Date; updatedAt: Date; }): ResultValue<UserEntity, InvalidEmailError | TypeError> {
+    static restore(props: { id: string; name: string; email: string; passwordHash: string; createdAt: Date; updatedAt: Date; }): ResultValue<UserEntity, InvalidEmailError> {
 
         const idResult = ID.from(props.id);
         if (idResult.isFail) return ResultValue.error(idResult.error);

@@ -10,7 +10,7 @@
   ],
   "scripts": {
     "build": "tsc",
-    "test": "jest"
+    "test": "jest --coverage=false"
   },
   "dependencies": {
     "nest-winston": "^1.10.2",

@@ -1,4 +1,4 @@
-import { RequestContextService } from './RequestContextService';
+import { RequestContextService } from '../../src/logger/RequestContextService';
 
 describe('RequestContextService', () => {
   // Each test using .startRequest() or .run() creates its own clean context,

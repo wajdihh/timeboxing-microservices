@@ -3,7 +3,7 @@ import { UserRepository } from '@identity/domain/user/UserRepository';
 import { TokenRepository } from '@identity/domain/auth/TokenRepository';
 import { UserEntity } from '@identity/domain/user/UserEntity';
 import { UserNotFoundError } from '@identity/domain/user/errors/UserNotFoundError';
-import { InvalidIDError, ID, ResultValue } from '@timeboxing/shared';
+import { InvalidIDError, ID, ResultValue, BaseInfraError } from '@timeboxing/shared';
 
 jest.mock('@timeboxing/shared', () => {
   const originalModule = jest.requireActual('@timeboxing/shared');
@@ -91,7 +91,7 @@ describe('DeleteUserUseCase', () => {
     const id = '123';
     const idValue = { value: id, equals: (other?: ID) => other?.value === id } as ID;
     (ID.from as jest.Mock).mockReturnValueOnce(ResultValue.ok(idValue));
-    const repoError = new Error('db');
+    const repoError = new BaseInfraError('db');
     mockUserRepository.findByID.mockResolvedValue(ResultValue.error(repoError));
 
     const result = await useCase.execute(id);

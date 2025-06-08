@@ -11,6 +11,11 @@ describe('CollectMetricsUseCase', () => {
       startRequestTimer: jest.fn(),
       incrementRequestCounter: jest.fn(),
       incrementErrorCounter: jest.fn(),
+      // Add missing methods to satisfy the MetricsPort interface
+      incrementLogin: jest.fn(),
+      incrementLogout: jest.fn(),
+      incrementRegistration: jest.fn(),
+      incrementRefreshToken: jest.fn(),
     } as jest.Mocked<MetricsPort>;
 
     useCase = new CollectMetricsUseCase(mockMetricsPort);
@@ -36,15 +41,16 @@ describe('CollectMetricsUseCase', () => {
       // Given
       const method = 'GET';
       const path = '/users';
+      const status = '200'; // Add status for the call
       const mockEndTimerFn = jest.fn();
       mockMetricsPort.startRequestTimer.mockReturnValue(mockEndTimerFn);
 
       // When
-      const endTimerFn = useCase.startRequestTimer(method, path);
+      const endTimerFn = useCase.startRequestTimer(method, path, status);
 
       // Then
       expect(endTimerFn).toBe(mockEndTimerFn);
-      expect(mockMetricsPort.startRequestTimer).toHaveBeenCalledWith(method, path);
+      expect(mockMetricsPort.startRequestTimer).toHaveBeenCalledWith(method, path, status);
       expect(mockMetricsPort.startRequestTimer).toHaveBeenCalledTimes(1);
     });
   });

@@ -1,13 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
 import { v4 as uuidv4 } from 'uuid';
-import { CorrelationIdMiddleware, CORRELATION_ID_HEADER } from './CorrelationIdMiddleware';
-import { RequestContextService } from './RequestContextService';
+import { CorrelationIdMiddleware, CORRELATION_ID_HEADER } from '../../src/logger/CorrelationIdMiddleware';
+import { RequestContextService } from '../../src/logger/RequestContextService';
 
 // Mock dependencies
 jest.mock('uuid', () => ({
   v4: jest.fn(),
 }));
-jest.mock('./RequestContextService');
+jest.mock('../../src/logger/RequestContextService');
 
 describe('CorrelationIdMiddleware', () => {
   let middleware: CorrelationIdMiddleware;

@@ -2,14 +2,16 @@ import { LoginUseCase } from "@identity/application/auth/LoginUseCase";
 import { PasswordHasherPort } from "@identity/application/auth/utils/PasswordHasherPort";
 import { UserEntity } from "@identity/domain/user/UserEntity";
 import { UserRepository } from "@identity/domain/user/UserRepository";
+import { MetricsPort } from "@identity/application/observability/MetricsPort";
 import { InvalidEmailError } from "@identity/domain/user/errors/InvalidEmailError";
 import { InvalidCredentialsError } from "@identity/domain/auth/errors/InvalidCredentialsError";
-import { ResultValue } from "@timeboxing/shared";
+import { ResultValue, BaseInfraError } from "@timeboxing/shared";
 
 describe('LoginUseCase', () => {
   let useCase: LoginUseCase;
   let mockUserRepo: jest.Mocked<UserRepository>;
   let mockPasswordHasher: jest.Mocked<PasswordHasherPort>;
+  let mockMetricsPort: jest.Mocked<MetricsPort>;
 
   beforeEach(() => {
     mockUserRepo = {
@@ -23,7 +25,18 @@ describe('LoginUseCase', () => {
       hash: jest.fn().mockResolvedValue('hashedPassword'),
     } as unknown as jest.Mocked<PasswordHasherPort>;
 
-    useCase = new LoginUseCase(mockUserRepo, mockPasswordHasher);
+    mockMetricsPort = {
+        incrementRegistration: jest.fn(),
+        incrementLogin: jest.fn(),
+        incrementLogout: jest.fn(),
+        incrementRefreshToken: jest.fn(),
+        getMetrics: jest.fn(),
+        startRequestTimer: jest.fn().mockReturnValue(jest.fn()),
+        incrementRequestCounter: jest.fn(),
+        incrementErrorCounter: jest.fn(),
+    } as jest.Mocked<MetricsPort>;
+
+    useCase = new LoginUseCase(mockUserRepo, mockPasswordHasher, mockMetricsPort);
   });
 
   it('should return tokens for valid credentials', async () => {
@@ -42,6 +55,7 @@ describe('LoginUseCase', () => {
     // then
     expect(result.isOk).toBe(true);
     expect(result.unwrap()).toBeInstanceOf(UserEntity);
+    expect(mockMetricsPort.incrementLogin).toHaveBeenCalled();
   });
 
   it('should return InvalidCredentialsError if user does not exist', async () => {
@@ -98,7 +112,7 @@ describe('LoginUseCase', () => {
     const email = 'test@example.com';
     const password = 'password123';
     // Simulate a failure in the repository layer
-    mockUserRepo.findByEmail.mockResolvedValue(ResultValue.error(new Error('Database error')));
+    mockUserRepo.findByEmail.mockResolvedValue(ResultValue.error(new BaseInfraError('Database error')));
 
     // When
     const result = await useCase.execute({ email, password });

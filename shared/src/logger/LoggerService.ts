@@ -2,21 +2,19 @@ import { Injectable, LoggerService as NestLoggerService, Scope } from '@nestjs/c
 import { ConfigService } from '@nestjs/config';
 import * as winston from 'winston';
 import { RequestContextService } from './RequestContextService';
+import { BaseError, ErrorType } from '../errors';
 
 export interface LogContext {
   useCase?: string;
   [key: string]: unknown;
 }
 
-@Injectable({ scope: Scope.TRANSIENT }) // TRANSIENT to get a new instance for each class that injects it, ensuring context is fresh
+@Injectable({ scope: Scope.TRANSIENT })
 export class LoggerService implements NestLoggerService {
   private logger: winston.Logger;
-  private serviceName: string;
+  private readonly serviceName: string;
 
-  constructor(
-    // We can't inject ConfigService directly here if LoggerService is used by ConfigService itself (circular dep)
-    private readonly configService?: ConfigService, // Optional for now
-  ) {
+  constructor(private readonly configService?: ConfigService) {
     this.serviceName = this.configService?.get<string>('SERVICE_NAME') || 'unknown-service';
     const logLevel = this.configService?.get<string>('LOG_LEVEL') || 'info';
 
@@ -24,104 +22,78 @@ export class LoggerService implements NestLoggerService {
       level: logLevel,
       format: winston.format.combine(
         winston.format.timestamp(),
-        winston.format.json(),
+        process.env.NODE_ENV === 'production'
+          ? winston.format.json()
+          : winston.format.colorize({ all: true }),
       ),
       transports: [
-        new winston.transports.Console({
-          format: winston.format.combine(
-            winston.format.colorize(),
-            winston.format.printf(info => {
-              const { timestamp, level, message, service, useCase, correlationId, ...meta } = info;
-              let log = `${timestamp} [${level}] (${service || this.serviceName})`;
-              if (correlationId) log += ` [${correlationId}]`;
-              if (useCase) log += ` (${useCase})`;
-              log += `: ${message}`;
-              if (Object.keys(meta).length) {
-                log += ` ${JSON.stringify(meta)}`;
-              }
-              return log;
-            })
-          )
-        }),
+        new winston.transports.Console(),
+        ...(process.env.NODE_ENV === 'production'
+          ? [
+              new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
+              new winston.transports.File({ filename: 'logs/combined.log' }),
+            ]
+          : []),
       ],
     });
-
-    // For production, ensure JSON logging to console if that's the target
-    // and add file transports.
-    if (process.env.NODE_ENV === 'production') {
-      this.logger.transports.forEach(t => {
-        if (t instanceof winston.transports.Console) {
-          t.format = winston.format.combine(
-            winston.format.timestamp(),
-            winston.format.json(),
-          );
-        }
-      });
-      this.logger.add(new winston.transports.File({ 
-        filename: 'logs/error.log', 
-        level: 'error',
-        format: winston.format.combine(
-          winston.format.timestamp(),
-          winston.format.json(),
-        ),
-      }));
-      this.logger.add(new winston.transports.File({ 
-        filename: 'logs/combined.log',
-        format: winston.format.combine(
-          winston.format.timestamp(),
-          winston.format.json(),
-        ),
-      }));
-    }
   }
 
-  private formatMessage(message: unknown, context?: string | LogContext): Record<string, unknown> {
+  private buildLogObject(message: unknown, context?: string | LogContext): Record<string, unknown> {
     const correlationId = RequestContextService.getCorrelationId();
-    const baseLog: Record<string, unknown> = {
+    const log: Record<string, unknown> = {
       service: this.serviceName,
-      correlationId: correlationId,
+      correlationId,
     };
 
     if (typeof context === 'string') {
-      // If context is a string, NestJS often passes the class name here.
-      // We can treat it as a simple context tag or part of the useCase.
-      baseLog.contextHint = context;
+      log.useCase = context;
     } else if (context && typeof context === 'object') {
-      Object.assign(baseLog, context); // Merge LogContext fields
-    }
-    
-    if (typeof message === 'object' && message !== null) {
-        return { ...baseLog, ...(message as Record<string, unknown>) };
+      Object.assign(log, context);
     }
 
-    return { ...baseLog, message };
+    if (message instanceof BaseError) {
+      log.message = message.message;
+      log.errorType = message.errorType;
+      log.name = message.name;
+      log.stacktrace = message.stack;
+      if (message.originalError) {
+        log.originalError = message.originalError instanceof Error
+          ? { message: message.originalError.message, stack: message.originalError.stack }
+          : message.originalError;
+      }
+    } else if (message instanceof Error) {
+      log.message = message.message;
+      log.errorType = ErrorType.UNKNOWN;
+      log.name = message.name;
+      log.stacktrace = message.stack;
+    } else if (typeof message === 'object' && message !== null) {
+      Object.assign(log, message);
+    } else {
+      log.message = message;
+    }
+
+    return log;
   }
 
   log(message: unknown, context?: string | LogContext) {
-    const logObject = this.formatMessage(message, context);
-    this.logger.info(logObject as winston.Logform.TransformableInfo);
+    this.logger.info(this.buildLogObject(message, context));
   }
 
   error(message: unknown, trace?: string, context?: string | LogContext) {
-    const logObject = this.formatMessage(message, context);
-    if (trace) {
-      logObject.stacktrace = trace;
-    }
-    this.logger.error(logObject as winston.Logform.TransformableInfo);
+    const log = this.buildLogObject(message, context);
+    if (trace && !log.stacktrace) log.stacktrace = trace;
+    this.logger.error(log);
   }
 
   warn(message: unknown, context?: string | LogContext) {
-    const logObject = this.formatMessage(message, context);
-    this.logger.warn(logObject as winston.Logform.TransformableInfo);
+    this.logger.warn(this.buildLogObject(message, context));
   }
 
   debug(message: unknown, context?: string | LogContext) {
-    const logObject = this.formatMessage(message, context);
-    this.logger.debug(logObject as winston.Logform.TransformableInfo);
+    this.logger.debug(this.buildLogObject(message, context));
   }
 
   verbose(message: unknown, context?: string | LogContext) {
-    const logObject = this.formatMessage(message, context);
-    this.logger.verbose(logObject as winston.Logform.TransformableInfo);
+    this.logger.verbose(this.buildLogObject(message, context));
   }
 }

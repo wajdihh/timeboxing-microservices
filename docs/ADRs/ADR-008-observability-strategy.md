@@ -59,9 +59,9 @@ This ADR provides a solid baseline for real-world readiness (even for local dev)
 
 ## ♻️ Correlation ID Propagation
 
-### ✅ Implemented:
+### ✅ Implemented in inboud and not in outbound calls
 
-* `CorrelationIdMiddleware` generates or propagates `x-correlation-id`
+* `CorrelationIdMiddleware` generates or propagates `x-correlation-id` //TODO in outbound
 * Stored in `RequestContextService`
 
 ### 🔮 Future:
