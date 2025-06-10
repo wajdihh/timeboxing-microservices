@@ -27,7 +27,7 @@ jest.mock('winston', () => {
     format: {
       combine: mockFormatCombine,
       timestamp: mockFormatTimestamp,
-      json: mockFormatJson,
+      printf: mockFormatJson,
       colorize: mockFormatColorize,
     },
     transports: {

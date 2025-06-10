@@ -93,7 +93,19 @@ reset:
   rm -rf node_modules libs/node_modules
   just clean
   docker rmi -f $(docker images -q)
-  
+
+# run all tests
+test-all:
+  cd shared && \
+  npm run test && \
+  cd ../microservices/identity-service && \
+  npm run test:unit && \
+  npm run test:e2e && \
+  npm run test:int
+
+# build all modules
+build-all:
+  npm run build
 
 # Security scanning
 scan:
